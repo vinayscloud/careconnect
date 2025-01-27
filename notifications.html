@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://source.unsplash.com/1920x1080/?office,workspace') no-repeat center center/cover;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+/* Navigation Bar */
+.navbar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .nav-links a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .navbar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .navbar .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .navbar .notifications .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff0000;
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 50%;
+        }
+
+        .notifications-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .notifications-panel h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-item .icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+
+        .notification-item .content {
+            flex: 1;
+            color: #010101;
+        }
+
+        .notification-item .mark-read {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .notification-item .mark-read:hover {
+            background: #0056b3;
+        }
+
+        .no-notifications {
+            text-align: center;
+            font-size: 1.25rem;
+            color: #555;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand">My App</div>
+        <div class="notifications">
+            <a href="index.html">Home</a>
+            <span class="icon">🔔</span>
+            <span class="badge" id="unread-count">3</span>
+        </div>
+    </div>
+
+    <div class="notifications-panel" id="notifications-panel">
+        <h1>Notifications</h1>
+        <div class="notification-item">
+            <div class="content">
+                Doctor's appointment tomorrow at 10 AM.
+            </div>
+            <button class="mark-read" onclick="markAsRead(this)">Mark as read</button>
+        </div>
+        <div class="notification-item">
+            <div class="content">
+                Your profile was updated successfully.
+            </div>
+            <button class="mark-read" onclick="markAsRead(this)">Mark as read</button>
+        </div>
+        <div class="notification-item">
+            <div class="content">
+                Blood test results are ready.
+            </div>
+            <button class="mark-read" onclick="markAsRead(this)">Mark as read</button>
+        </div>
+    </div>
+
+    <script>
+        function markAsRead(button) {
+            const notification = button.parentElement;
+            notification.style.display = 'none';
+
+            const unreadCount = document.getElementById('unread-count');
+            let count = parseInt(unreadCount.textContent);
+            count = count > 0 ? count - 1 : 0;
+            unreadCount.textContent = count;
+
+            const notificationsPanel = document.getElementById('notifications-panel');
+            const remainingNotifications = notificationsPanel.querySelectorAll('.notification-item:not([style*="display: none"])');
+
+            if (remainingNotifications.length === 0) {
+                notificationsPanel.innerHTML = '<div class="no-notifications">No more notifications.</div>';
+            }
+        }
+    </script>
+</body>
+</html>
