@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Profile</title>
+    <link rel="stylesheet" href="doctor-profile.css" />
+  </head>
+  <body>
+    <!-- Navbar Section -->
+    <div class="navbar">
+      <div class="brand">CareConnect</div>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../doctor-profile/doctor-profile.html">Doctors</a>
+        <a href="../booking-form/booking-form.html">Appointment</a>
+        <a href="../notifications/notifications.html">
+          <div class="notifications">
+            <span class="icon">🔔</span>
+            <!-- <span class="badge">0</span> -->
+          </div>
+        </a>
+        <a href="../login/login.html">Login</a>
+      </div>
+    </div>
+
+    <!-- Search Bar Section -->
+    <div class="search-container">
+      <div class="search-bar">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search doctors by name, location, or specialty..."
+        />
+        <button id="searchButton">Search</button>
+      </div>
+      <div class="loading" id="loading" style="display: none">
+        Loading results...
+      </div>
+      <div class="results" id="results"></div>
+    </div>
+
+    <!-- Doctor Profiles Section -->
+    <div class="doctor-profiles-container" id="doctorProfiles"></div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+      <h2>User Reviews</h2>
+      <div class="review">
+        <div class="reviewer">Sarah Lee</div>
+        <div class="review-text">
+          "Dr. Doe is amazing! He took the time to explain my condition and
+          provided a thorough treatment plan. Highly recommended!"
+        </div>
+      </div>
+      <div class="review">
+        <div class="reviewer">Mark Smith</div>
+        <div class="review-text">
+          "Great experience. Very professional and knowledgeable. I felt very
+          comfortable during my visit."
+        </div>
+      </div>
+      <div class="review">
+        <div class="reviewer">Emily Johnson</div>
+        <div class="review-text">
+          "Dr. Doe's care is second to none. He helped me manage my condition
+          with great expertise and compassion."
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Placeholder data for doctors (to be replaced with actual API calls)
+      const doctorsPlaceholder = [
+        {
+          id: 1,
+          name: "Dr. John Doe",
+          specialty: "Cardiologist",
+          location: "New York",
+          experience: "12 years",
+          rating: 4.5,
+          image:
+            "https://static.vecteezy.com/system/resources/previews/026/375/249/non_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
+        },
+        {
+          id: 2,
+          name: "Dr. Sarah Lee",
+          specialty: "Dermatologist",
+          location: "Los Angeles",
+          experience: "8 years",
+          rating: 4.3,
+          image:
+            "https://static.vecteezy.com/system/resources/previews/003/669/495/non_2x/portrait-of-young-female-doctor-isolated-on-blue-background-photo.jpg",
+        },
+        {
+          id: 3,
+          name: "Dr. Michael Brown",
+          specialty: "Orthopedic",
+          location: "Chicago",
+          experience: "15 years",
+          rating: 5.0,
+          image:
+            "https://thumbs.dreamstime.com/b/young-male-doctor-close-up-happy-looking-camera-56751540.jpg",
+        },
+      ];
+
+      // Function to fetch doctors (currently using placeholder data)
+      async function fetchDoctors(searchQuery) {
+        // Simulate an API call
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const filteredDoctors = doctorsPlaceholder.filter((doctor) => {
+              return (
+                doctor.name.toLowerCase().includes(searchQuery) ||
+                doctor.specialty.toLowerCase().includes(searchQuery) ||
+                doctor.location.toLowerCase().includes(searchQuery)
+              );
+            });
+            resolve(filteredDoctors);
+          }, 1000);
+        });
+      }
+
+      // Function to render doctor profiles
+      function renderDoctors(doctors) {
+        const profilesContainer = document.getElementById("doctorProfiles");
+        profilesContainer.innerHTML = ""; // Clear previous profiles
+
+        if (doctors.length === 0) {
+          profilesContainer.innerHTML = "<p>No doctors found.</p>";
+          return;
+        }
+
+        doctors.forEach((doctor) => {
+          const doctorCard = document.createElement("div");
+          doctorCard.className = "doctor-profile";
+
+          doctorCard.innerHTML = `
+                    <div class="doctor-photo">
+                        <img src="${doctor.image}" alt="${doctor.name}">
+                    </div>
+                    <div class="doctor-details">
+                        <h1>${doctor.name}</h1>
+                        <p><strong>Specialty:</strong> ${doctor.specialty}</p>
+                        <p><strong>Location:</strong> ${doctor.location}</p>
+                        <p><strong>Experience:</strong> ${doctor.experience}</p>
+                        <div class="rating">★ ${doctor.rating}/5</div>
+                        <a href="../booking-form/booking-form.html?id=${doctor.id}" class="book-appointment">Book Appointment</a>
+                    </div>
+                `;
+          profilesContainer.appendChild(doctorCard);
+        });
+      }
+
+      // Event listener for search functionality
+      document
+        .getElementById("searchButton")
+        .addEventListener("click", async () => {
+          const searchInput = document
+            .getElementById("searchInput")
+            .value.toLowerCase();
+          const loadingIndicator = document.getElementById("loading");
+
+          // Show loading indicator
+          loadingIndicator.style.display = "block";
+
+          // Fetch and render doctors
+          const doctors = await fetchDoctors(searchInput);
+
+          // Hide loading indicator
+          loadingIndicator.style.display = "none";
+
+          // Render fetched doctors
+          renderDoctors(doctors);
+        });
+
+      // Initial rendering of all doctors
+      renderDoctors(doctorsPlaceholder);
+    </script>
+  </body>
+</html>
