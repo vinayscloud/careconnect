@@ -1,0 +1,379 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .navbar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .nav-links a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .search-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 50px;
+            outline: none;
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+
+        .search-bar button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            color: #fff;
+            background: #007bff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-bar button:hover {
+            background: #0056b3;
+        }
+
+        .loading {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .results {
+            margin-top: 1rem;
+        }
+
+        .doctor-profiles-container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .doctor-profile {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            gap: 1rem;
+        }
+
+        .doctor-photo {
+            flex: 0 0 200px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .doctor-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .doctor-details {
+            flex: 1;
+        }
+
+        .doctor-details h1 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .doctor-details p {
+            color: #555;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .doctor-details .rating {
+            font-size: 1.2rem;
+            color: #ff9900;
+            margin-bottom: 1.5rem;
+        }
+
+        .book-appointment {
+            background-color: #007bff;
+            color: #fff;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .book-appointment:hover {
+            background-color: #0056b3;
+        }
+
+        .reviews-section {
+            margin-top: 2rem;
+            width: 100%;
+        }
+
+        .reviews-section h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .review {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .review .reviewer {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+
+        .review .review-text {
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .doctor-profile {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .doctor-photo {
+                flex: 0 0 150px;
+            }
+
+            .doctor-details h1 {
+                font-size: 1.5rem;
+            }
+
+            .book-appointment {
+                font-size: 1rem;
+            }
+            
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand">My Health App</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="notifications.html">Notifications</a>
+            <a href="doctor-profile.html">Doctors</a>
+            <a href="login.html">Login</a>
+        </div>
+    </div>
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search doctors by name, location, or specialty...">
+            <button onclick="searchDoctors()">Search</button>
+        </div>
+        <div class="loading" id="loading" style="display: none;">Loading results...</div>
+        <div class="results" id="results"></div>
+    </div>
+    
+    <div class="doctor-profiles-container">
+        <!-- Doctor 1 -->
+        <div class="doctor-profile">
+            <div class="doctor-photo">
+                <img src="https://static.vecteezy.com/system/resources/previews/026/375/249/non_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg" alt="Dr. John Doe">
+            </div>
+            <div class="doctor-details">
+                <h1>Dr. John Doe</h1>
+                <p><strong>Specialty:</strong> Cardiologist</p>
+                <p><strong>Experience:</strong> 12 years</p>
+                <div class="rating">
+                    ★★★★☆ (4.5/5) | 200 Reviews
+                </div>
+                <p>
+                    Dr. John Doe is a highly experienced cardiologist, specializing in heart disease prevention, diagnosis, and treatment. He is passionate about helping patients achieve optimal heart health.
+                </p>
+                <a href="booking-form.html" class="book-appointment">Book Appointment</a>
+            </div>
+        </div>
+
+        <!-- Doctor 2 -->
+        <div class="doctor-profile">
+            <div class="doctor-photo">
+                <img src="https://static.vecteezy.com/system/resources/previews/003/669/495/non_2x/portrait-of-young-female-doctor-isolated-on-blue-background-photo.jpg" alt="Dr. Sarah Lee">
+            </div>
+            <div class="doctor-details">
+                <h1>Dr. Sarah Lee</h1>
+                <p><strong>Specialty:</strong> Dermatologist</p>
+                <p><strong>Experience:</strong> 8 years</p>
+                <div class="rating">
+                    ★★★★☆ (4.3/5) | 180 Reviews
+                </div>
+                <p>
+                    Dr. Sarah Lee is a skilled dermatologist specializing in skincare, acne treatment, and skin health. Her compassionate approach ensures the best treatment for her patients, providing personalized skincare solutions.
+                </p>
+                <a href="booking-form.html" class="book-appointment">Book Appointment</a>
+            </div>
+        </div>
+
+        <!-- Doctor 3 -->
+        <div class="doctor-profile">
+            <div class="doctor-photo">
+                <img src="https://thumbs.dreamstime.com/b/young-male-doctor-close-up-happy-looking-camera-56751540.jpg" alt="Dr. Michael Brown">
+            </div>
+            <div class="doctor-details">
+                <h1>Dr. Michael Brown</h1>
+                <p><strong>Specialty:</strong> Orthopedic</p>
+                <p><strong>Experience:</strong> 15 years</p>
+                <div class="rating">
+                    ★★★★★ (5/5) | 220 Reviews
+                </div>
+                <p>
+                    Dr. Michael Brown is an orthopedic surgeon with expertise in joint replacements and sports injuries. He has helped many patients regain mobility and improve their quality of life through advanced surgical techniques.
+                </p>
+                <a href="booking-form.html" class="book-appointment">Book Appointment</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+        <h2>User Reviews</h2>
+        <div class="review">
+            <div class="reviewer">Sarah Lee</div>
+            <div class="review-text">
+                "Dr. Doe is amazing! He took the time to explain my condition and provided a thorough treatment plan. Highly recommended!"
+            </div>
+        </div>
+        <div class="review">
+            <div class="reviewer">Mark Smith</div>
+            <div class="review-text">
+                "Great experience. Very professional and knowledgeable. I felt very comfortable during my visit."
+            </div>
+        </div>
+        <div class="review">
+            <div class="reviewer">Emily Johnson</div>
+            <div class="review-text">
+                "Dr. Doe's care is second to none. He helped me manage my condition with great expertise and compassion."
+            </div>
+        </div>
+    </div>
+    <script>
+        const doctors = [
+            { name: "Dr. John Doe", specialty: "Cardiologist", location: "New York" },
+            { name: "Dr. Sarah Lee", specialty: "Dermatologist", location: "Los Angeles" },
+            { name: "Dr. Michael Brown", specialty: "Orthopedic", location: "Chicago" },
+        ];
+
+        function searchDoctors() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const resultsContainer = document.getElementById('results');
+            const loadingIndicator = document.getElementById('loading');
+
+            resultsContainer.innerHTML = '';
+            loadingIndicator.style.display = 'block';
+
+            setTimeout(() => {
+                loadingIndicator.style.display = 'none';
+
+                const filteredDoctors = doctors.filter(doctor =>
+                    doctor.name.toLowerCase().includes(input) ||
+                    doctor.specialty.toLowerCase().includes(input) ||
+                    doctor.location.toLowerCase().includes(input)
+                );
+
+                if (filteredDoctors.length === 0) {
+                    resultsContainer.innerHTML = '<p>No results found.</p>';
+                    return;
+                }
+
+                filteredDoctors.forEach(doctor => {
+                    const doctorCard = document.createElement('div');
+                    doctorCard.className = 'doctor-card';
+
+                    doctorCard.innerHTML = `
+                        <h3>${doctor.name}</h3>
+                        <p><strong>Specialty:</strong> ${doctor.specialty}</p>
+                        <p><strong>Location:</strong> ${doctor.location}</p>
+                    `;
+
+                    resultsContainer.appendChild(doctorCard);
+                });
+            }, 1000);
+        }
+    </script>
+    
+</body>
+</html>
