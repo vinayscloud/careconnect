@@ -210,3 +210,98 @@ body {
     font-size: 1.5rem;
   }
 }
+
+/* Add to the existing CSS */
+
+/* General Styles for the filters (specialty, city, experience, rating) */
+.search-bar select,
+.search-bar input[type="number"] {
+    width: 200px; /* Adjust width for uniformity */
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    outline: none;
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+/* Focus effect on filters */
+.search-bar select:focus,
+.search-bar input[type="number"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+/* Adjust the button for search */
+.search-bar button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: #fff;
+    background: #007bff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Hover effect on button */
+.search-bar button:hover {
+    background: #0056b3;
+}
+
+/* Apply margin for spacing between filters */
+.search-bar select,
+.search-bar input[type="number"] {
+    margin: 0.5rem;
+}
+
+/* Adjusting search bar layout */
+.search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    width: 700px;
+}
+
+/* Loading text styling */
+.loading {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Doctor profile container */
+.doctor-profiles-container {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Doctor profile card */
+.doctor-profile {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    gap: 1rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .search-bar {
+        width: 100%;
+        justify-content: space-between;
+        flex-direction: column;
+    }
+
+    .doctor-profile {
+        flex-direction: column;
+        align-items: center;
+    }
+}
