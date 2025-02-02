@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/notifications.css') }}">
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="brand">
+        <a class="nav-app-name" href="{{ url_for('index') }}">CareConnect</a>
+      </div>
+      <!-- <div class="notifications">
+        <span class="icon">🔔</span>
+        <span class="badge">0</span>
+      </div> -->
+    </div>
+
+    <div class="notifications-panel" id="notifications-panel">
+      <h1>Notifications</h1>
+      <ul id="notifications-list">
+        <!-- Notifications will be dynamically added here -->
+      </ul>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const badge = document.querySelector(".badge");
+        const notificationsList = document.getElementById("notifications-list");
+
+        // Dummy notifications (replace with API calls later)
+        const notifications = [
+          { id: 1, text: "Doctor's appointment tomorrow at 10 AM." },
+          { id: 2, text: "Your profile was updated successfully." },
+          { id: 3, text: "Blood test results are ready." },
+        ];
+
+        function renderNotifications() {
+          notificationsList.innerHTML = "";
+          if (notifications.length === 0) {
+            notificationsList.innerHTML =
+              '<div class="no-notifications">No more notifications.</div>';
+          } else {
+            notifications.forEach((notification) => {
+              const li = document.createElement("li");
+              li.className = "notification-item";
+              li.innerHTML = `
+                            <div class="content">${notification.text}</div>
+                            <button class="mark-read" data-id="${notification.id}">Mark as read</button>
+                        `;
+              notificationsList.appendChild(li);
+            });
+          }
+
+          badge.textContent = notifications.length;
+        }
+
+        notificationsList.addEventListener("click", (event) => {
+          if (event.target.classList.contains("mark-read")) {
+            const id = parseInt(event.target.dataset.id);
+            const index = notifications.findIndex((n) => n.id === id);
+            if (index > -1) {
+              notifications.splice(index, 1); // Remove notification
+              renderNotifications();
+            }
+          }
+        });
+
+        // Initial rendering
+        renderNotifications();
+      });
+    </script>
+  </body>
+</html>

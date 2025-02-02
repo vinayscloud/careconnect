@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/booking-form.css') }}">
+  </head>
+  <body>
+    <div class="appointment-form">
+      <h1>Book an Appointment</h1>
+      <form id="appointment-form">
+        <!-- Hidden Fields for Doctor Details -->
+        <input type="hidden" id="doctorId" name="doctorId" />
+        <input type="hidden" id="doctorName" name="doctorName" />
+
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            placeholder="Enter your full name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="Enter your email address"
+          />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            required
+            placeholder="Enter your phone number"
+          />
+        </div>
+        <div class="form-group">
+          <label for="date">Preferred Date</label>
+          <input type="date" id="date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label for="time">Preferred Time</label>
+          <select id="time" name="time" required>
+            <option value="9:00 AM">9:00 AM</option>
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="11:00 AM">11:00 AM</option>
+            <option value="2:00 PM">2:00 PM</option>
+            <option value="3:00 PM">3:00 PM</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="notes">Special Notes or Symptoms</label>
+          <textarea
+            id="notes"
+            name="notes"
+            placeholder="Enter any special notes or symptoms"
+          ></textarea>
+        </div>
+        <button type="submit" class="submit-btn">Submit Appointment</button>
+      </form>
+      <div class="confirmation" id="confirmation" style="display: none">
+        <p>Your appointment has been successfully booked!</p>
+      </div>
+      <div class="back-btn">
+        <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Back to Doctor Profile</a>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("appointment-form");
+      const confirmation = document.getElementById("confirmation");
+
+      // Get doctor details from URL query parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const doctorId = urlParams.get("doctorId");
+      const doctorName = urlParams.get("doctorName");
+
+      // Set doctor details in the hidden fields
+      document.getElementById("doctorId").value = doctorId;
+      document.getElementById("doctorName").value = doctorName;
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault(); // Prevent form from reloading the page
+
+        // Gather form data
+        const formData = new FormData(form);
+        const requestData = {
+          doctorId: formData.get("doctorId"),
+          doctorName: formData.get("doctorName"),
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          date: formData.get("date"),
+          time: formData.get("time"),
+          notes: formData.get("notes"),
+        };
+
+        console.log("Form Data:", requestData);
+
+        fetch("/api/book-appointment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              form.style.display = "none";
+              confirmation.style.display = "block";
+            } else {
+              console.error("Failed to book appointment:", data.error);
+              alert("Error submitting appointment. Please try again later.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error submitting appointment:", error);
+            alert("An error occurred. Please try again later.");
+          });
+      });
+    </script>
+  </body>
+</html>

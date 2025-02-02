@@ -1,0 +1,3 @@
+variable "resource" {
+  type     = string
+}

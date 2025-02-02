@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Login Page</title>
+    <link rel="stylesheet" href="../assets/styles/login.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h1>Login</h1>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+        <button type="submit" class="btn">Login</button>
+      </form>
+      <div class="forgot-password">
+        <a href="#">Forgot Password?</a>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent form submission
+
+          // Retrieve input values
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          // Simulate API call with dummy logic
+          console.log("Attempting login...");
+          setTimeout(() => {
+            if (email === "test@example.com" && password === "password123") {
+              console.log("Login successful");
+              // alert("Login successful!");
+              // Redirect to another page
+              window.location.href = "../pages/index.html"; // Replace with actual page
+            } else {
+              console.log("Login failed");
+              // alert("Invalid email or password. Please try again.");
+            }
+          }, 1000); // Simulate network delay
+        });
+    </script>
+  </body>
+</html>
