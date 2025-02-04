@@ -20,3 +20,7 @@ def get_db_connection():
     """Returns the active SQLAlchemy database session."""
     return db.session
 
+
+
+
+
