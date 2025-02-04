@@ -1,24 +1,38 @@
-# Description: This is the main file that runs the Flask application. It imports the create_app function from the app package and runs the application. 
-# The create_app function initializes the Flask app, sets the configuration, and registers the routes blueprint. 
-# The app.run() method starts the Flask development server.
-
-# from app import create_app
-
-# app = create_app()
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-
 from flask import Flask, render_template
+from flask_cors import CORS
+from app.config import Config
+from app.database import init_db, db
+from app.routes.doctors import doctors_bp  # Import the doctors API route
+from app.routes.appointments import appointments_bp  
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__, template_folder="../frontend/pages", static_folder="../frontend/assets")  # ✅ Load from frontend/
 
+# ✅ Initialize Flask App
+app = Flask(__name__, template_folder="../frontend/pages", static_folder="../frontend/assets")
+
+# ✅ Load Configuration
+app.config.from_object(Config)
+
+
+
+# ✅ Enable CORS (Cross-Origin Resource Sharing)
+CORS(app)
+
+# ✅ Initialize Database
+init_db(app)
+\
+
+# ✅ Register API Blueprints (Routes)
+app.register_blueprint(doctors_bp, url_prefix="/api/doctors")  # Example route
+app.register_blueprint(appointments_bp) 
+# ✅ Serve Frontend Pages
 @app.route('/')
 def index():
     return render_template("index.html")  # Default page
 
 # ✅ Dynamic Route to Load Any HTML File
+
 @app.route('/pages/<page_name>')
 def load_page(page_name):
     try:
@@ -26,7 +40,8 @@ def load_page(page_name):
     except:
         return "Page not found", 404
 
+
+# ✅ Run the Flask App
 if __name__ == '__main__':
     app.run(debug=True)
-
 

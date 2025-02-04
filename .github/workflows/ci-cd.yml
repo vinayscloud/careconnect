@@ -1,14 +1,40 @@
-name: Deploy to AWS
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - final
 
 jobs:
-  deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-      - name: Deploy Infrastructure
-        run: terraform apply -auto-approve
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: us-east-1
+
+    - name: Log in to Amazon ECR
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 548895127859.dkr.ecr.us-east-1.amazonaws.com
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t 548895127859.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repository:latest .
+        docker push 548895127859.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repository:latest
+
+    - name: Run ECS Task
+      run: |
+        aws ecs run-task \
+          --cluster my-ecs-cluster \
+          --task-definition my-task-definition \
+          --launch-type EC2 \
+          --count 1 \
+          --subnet subnet-0347b0de938a628bb \ # Update subnet ID here
+          --security-group sg-0123456789abcdef0
