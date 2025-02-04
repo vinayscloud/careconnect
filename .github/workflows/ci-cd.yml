@@ -1,40 +1,39 @@
-name: CI/CD Pipeline
+name: Deploy to AWS ECS
 
 on:
   push:
     branches:
-      - final
+      - main  # Triggers deployment when code is pushed to the main branch
 
 jobs:
-  build_and_deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Set up AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Ensure this matches your AWS region
 
-    - name: Log in to Amazon ECR
-      run: |
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 548895127859.dkr.ecr.us-east-1.amazonaws.com
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and push Docker image
-      run: |
-        docker build -t 548895127859.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repository:latest .
-        docker push 548895127859.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repository:latest
+      - name: Build and Tag Docker Image
+        run: |
+          ECR_REPO_URI=548895127859.dkr.ecr.us-east-1.amazonaws.com/flask-app
+          docker build -t $ECR_REPO_URI:latest .
+          echo "ECR_REPO_URI=$ECR_REPO_URI" >> $GITHUB_ENV
 
-    - name: Run ECS Task
-      run: |
-        aws ecs run-task \
-          --cluster my-ecs-cluster \
-          --task-definition flaskapplication:1 \
-          --launch-type FARGATE \
-          --count 1 \
-          --network-configuration "awsvpcConfiguration={subnets=[subnet-0347b0de938a628bb],securityGroups=[sg-09278d002bb5c8753],assignPublicIp=ENABLED}" \
-          --region us-east-1
+      - name: Push Docker Image to Amazon ECR
+        run: |
+          docker push ${{ env.ECR_REPO_URI }}:latest
+
+      - name: Deploy New Image to ECS
+        run: |
+          aws ecs update-service --cluster flask-cluster --service flask-service --force-new-deployment
