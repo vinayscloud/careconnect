@@ -17,5 +17,7 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
+*.exe
+
 # .terraform.lock.hcl
 .terraform.lock.hcl
