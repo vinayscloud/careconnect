@@ -36,5 +36,5 @@ jobs:
           --task-definition flaskapplication:1 \
           --launch-type FARGATE \
           --count 1 \
-          --network-configuration "awsvpcConfiguration={subnets=[subnet-0347b0de938a628bb],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}" \
+          --network-configuration "awsvpcConfiguration={subnets=[subnet-0347b0de938a628bb],securityGroups=[sg-09278d002bb5c8753],assignPublicIp=ENABLED}" \
           --region us-east-1
