@@ -29,11 +29,11 @@ jobs:
         docker build -t 548895127859.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repository:latest .
         docker push 548895127859.dkr.ecr.us-east-1.amazonaws.com/my-ecr-repository:latest
 
-    - name: Run ECS Task (Fargate)
+    - name: Run ECS Task
       run: |
         aws ecs run-task \
           --cluster my-ecs-cluster \
-          --task-definition my-task-definition \
+          --task-definition flaskapplication:1 \ 
           --launch-type FARGATE \
           --count 1 \
           --network-configuration "awsvpcConfiguration={subnets=[subnet-0347b0de938a628bb],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}"
