@@ -36,5 +36,5 @@ jobs:
           --task-definition my-task-definition \
           --launch-type EC2 \
           --count 1 \
-          --subnet subnet-0347b0de938a628bb \ # Update subnet ID here
+          --subnet subnet-0347b0de938a628bb \
           --security-group sg-0123456789abcdef0
