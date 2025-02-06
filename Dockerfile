@@ -16,4 +16,3 @@ EXPOSE 5000
 
 # Command to run the application using Gunicorn
 CMD ["python", "backend/run.py"]
-his
