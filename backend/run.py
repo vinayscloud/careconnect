@@ -4,6 +4,7 @@ from app.config import Config
 from app.database import init_db, db
 from app.routes.doctors import doctors_bp  # Import the doctors API route
 from app.routes.appointments import appointments_bp  
+from app.routes.auth import auth_bp 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -21,11 +22,12 @@ CORS(app)
 
 # ✅ Initialize Database
 init_db(app)
-\
+
 
 # ✅ Register API Blueprints (Routes)
 app.register_blueprint(doctors_bp, url_prefix="/api/doctors")  # Example route
 app.register_blueprint(appointments_bp) 
+app.register_blueprint(auth_bp) 
 # ✅ Serve Frontend Pages
 @app.route('/')
 def index():
