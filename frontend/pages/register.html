@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign-Up Page</title>
+    <link rel="stylesheet" href="../assets/styles/login.css" />
+  </head>
+  <body>
+    <div class="signup-container">
+      <h1>Create Account</h1>
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="username">Full Name</label>
+          <input
+            type="text"
+            id="username"
+            placeholder="Enter your full name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Create a password"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="confirm-password">Confirm Password</label>
+          <input
+            type="password"
+            id="confirm-password"
+            placeholder="Confirm your password"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="">Select your role</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Patient">Patient</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Sign Up</button>
+      </form>
+      <div class="login-redirect">
+        Already have an account? <a href="/login">Login</a>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("signup-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const username = document.getElementById("username").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const confirmPassword = document.getElementById("confirm-password").value;
+          const role = document.getElementById("role").value;
+
+          if (password !== confirmPassword) {
+            alert("Passwords do not match. Please try again.");
+            return;
+          }
+
+          if (!role) {
+            alert("Please select a role.");
+            return;
+          }
+
+          const response = await fetch("/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password, role }),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            alert(result.message);
+            window.location.href = "/login";
+          } else {
+            alert(result.error);
+          }
+        });
+    </script>
+  </body>
+</html>

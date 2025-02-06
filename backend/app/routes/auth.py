@@ -85,6 +85,7 @@ def register_user():
 
     username = data.get("username")
     email = data.get("email")
+    role = data.get("role")
     password = data.get("password")
 
     if not username or not email or not password:
@@ -101,8 +102,8 @@ def register_user():
         print(f"[DEBUG] Registering user: {username}, Email: {email}")
 
         cursor.execute("""
-            INSERT INTO users (username, email, password) VALUES (%s, %s, %s)
-        """, (username, email, hashed_password))
+            INSERT INTO users (username, email, password, role) VALUES (%s, %s, %s, %s)
+        """, (username, email, hashed_password, role))
         conn.commit()
 
         print(f"[DEBUG] User {username} registered successfully")
