@@ -1,6 +1,6 @@
 from app.database import db
 
-class Doctor(db.Model):
+class doctors(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     specialty = db.Column(db.String(100), nullable=False)
@@ -9,7 +9,7 @@ class Doctor(db.Model):
     rating = db.Column(db.Float)
 
 
-class Appointment(db.Model):
+class appointments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)  # Foreign Key linking to Doctor
     doctor_name = db.Column(db.String(100), nullable=False)  # Store the doctor's name for easy access
