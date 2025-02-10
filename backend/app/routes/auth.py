@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, session, redirect, url_for
 import mysql.connector
 import hashlib
 
@@ -29,19 +29,18 @@ def hash_password(password):
     print("[DEBUG] Hashing password")
     return hashlib.sha256(password.encode()).hexdigest()
 
-# Login Page
+# ✅ Login Page
 @auth_bp.route("/login")
 def login_page():
     print("[DEBUG] Rendering login page")
     return render_template('login.html')
 
-# Login API
+# ✅ Login API (with Session Storage & Success Message)
+# ✅ Login API (with Role-Based Redirection)
 @auth_bp.route("/login", methods=["POST"])
 def login_user():
     print("[DEBUG] Received login request")
     data = request.json
-    print(f"[DEBUG] Login data received: {data}")
-
     email = data.get("email")
     password = data.get("password")
 
@@ -54,18 +53,30 @@ def login_user():
         return jsonify({"error": "Database connection failed"}), 500
 
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         hashed_password = hash_password(password)
         print(f"[DEBUG] Checking user in database with email: {email}")
 
         cursor.execute("""
-            SELECT id, username FROM users WHERE email = %s AND password = %s
+            SELECT id, username, role FROM users WHERE email = %s AND password = %s
         """, (email, hashed_password))
         user = cursor.fetchone()
 
         if user:
-            print(f"[DEBUG] Login successful for user: {user[1]}")
-            return jsonify({"message": "Login successful", "user": {"id": user[0], "username": user[1]}}), 200
+            session['user_id'] = user['id']
+            session['username'] = user['username']
+            session['role'] = user['role'].strip().lower()  # Ensure lowercase for consistency
+
+            print(f"[DEBUG] Login successful for user: {user['username']} with role: {session['role']}")
+
+            # ✅ Determine redirect based on role
+            redirect_url = "/patient.html" if session['role'] == 'patient' else "/doctor.html"
+
+            return jsonify({
+                "message": "Login successful!",
+                "username": user['username'],
+                "redirect": redirect_url  # Send correct redirect URL
+            }), 200
         else:
             print("[ERROR] Invalid login credentials")
             return jsonify({"error": "Invalid credentials"}), 401
@@ -76,7 +87,15 @@ def login_user():
         cursor.close()
         conn.close()
 
-# Register API
+
+# ✅ Logout API (Clears Session)
+@auth_bp.route("/logout", methods=["GET"])
+def logout():
+    print("[DEBUG] Logging out user")
+    session.clear()
+    return jsonify({"message": "Logged out successfully!"}), 200
+
+# ✅ Register API (Restored)
 @auth_bp.route("/register", methods=["POST"])
 def register_user():
     print("[DEBUG] Received registration request")
@@ -88,8 +107,8 @@ def register_user():
     role = data.get("role")
     password = data.get("password")
 
-    if not username or not email or not password:
-        print("[ERROR] Missing username, email, or password")
+    if not username or not email or not password or not role:
+        print("[ERROR] Missing username, email, password, or role")
         return jsonify({"error": "Missing required fields"}), 400
 
     conn = create_connection()
@@ -99,11 +118,11 @@ def register_user():
     try:
         cursor = conn.cursor()
         hashed_password = hash_password(password)
-        print(f"[DEBUG] Registering user: {username}, Email: {email}")
+        print(f"[DEBUG] Registering user: {username}, Email: {email}, Role: {role}")
 
         cursor.execute("""
             INSERT INTO users (username, email, password, role) VALUES (%s, %s, %s, %s)
-        """, (username, email, hashed_password, role))
+        """, (username, email, hashed_password, role.lower()))  # Store role in lowercase
         conn.commit()
 
         print(f"[DEBUG] User {username} registered successfully")
@@ -115,10 +134,15 @@ def register_user():
         cursor.close()
         conn.close()
 
-# Register Page
+# ✅ Register Page
 @auth_bp.route("/register_page")
 def register_page():
     print("[DEBUG] Rendering register page")
     return render_template('register.html')
 
 
+@auth_bp.route("/check_session", methods=["GET"])
+def check_session():
+    if "user_id" in session:
+        return jsonify({"logged_in": True, "username": session["username"]}), 200
+    return jsonify({"logged_in": False}), 200
