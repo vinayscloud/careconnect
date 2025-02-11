@@ -5,7 +5,6 @@ from app.database import init_db, db
 from app.routes.doctors import doctors_bp  # Import the doctors API route
 from app.routes.appointments import appointments_bp  
 from app.routes.auth import auth_bp 
-from app.routes.profile import profile_bp
 from app.routes.admin_user import admin_user_bp
 from flask_sqlalchemy import SQLAlchemy
 
@@ -29,7 +28,6 @@ init_db(app)
 app.register_blueprint(doctors_bp, url_prefix="/api/doctors")  # Example route
 app.register_blueprint(appointments_bp) 
 app.register_blueprint(auth_bp)
-app.register_blueprint(profile_bp)
 app.register_blueprint(admin_user_bp)
 # ✅ Serve Frontend Pages
 @app.route('/')

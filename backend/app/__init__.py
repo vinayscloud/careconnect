@@ -28,4 +28,5 @@ def create_app():
     app.register_blueprint(appointment_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_user_bp)
+    app.register_blueprint(profile_bp)
     return app
