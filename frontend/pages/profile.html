@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div class="profile-container">
+        <h2 class="profile-title">Profile Settings</h2>
+
+        <div class="profile-card">
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="full_name" disabled class="readonly">
+                </div>
+
+                <div class="form-group">
+                    <label>Email <i class="fas fa-pencil-alt edit-icon" onclick="makeEditable('email')"></i></label>
+                    <input type="email" id="email" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone <i class="fas fa-pencil-alt edit-icon" onclick="makeEditable('phone')"></i></label>
+                    <input type="text" id="phone" readonly>
+                </div>
+
+                <button type="submit" class="update-btn">Update Profile</button>
+                <p id="profileMessage"></p>
+            </form>
+        </div>
+
+        <h2 class="profile-title">Change Password</h2>
+        <div class="profile-card">
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label>Old Password</label>
+                    <input type="password" id="old_password" required>
+                </div>
+
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="new_password" required>
+                </div>
+
+                <button type="submit" class="update-btn">Change Password</button>
+                <p id="passwordMessage"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="profile.js"></script>
+
+</body>
+</html>
