@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User Management</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href= "{{ url_for('static', filename='styles/admin-user-dashboard.css') }}"> <!-- Link to External CSS -->
+</head>
+<body>
+    <h2>Super Admin - Manage Users</h2>
+
+    <div id="search-container">
+        <input type="text" id="searchInput" placeholder="Search by User ID or Username/Email">
+        <button onclick="searchUser()">Search</button>
+    </div>
+
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        function searchUser() {
+            let query = document.getElementById("searchInput").value.trim();
+            if (!query) { 
+                alert("Please enter a User ID, Username, or Email."); 
+                return; 
+            }
+
+            let data = {};
+            if (!isNaN(query) && Number.isInteger(parseFloat(query))) {
+                data = { user_id: query };
+            } else {
+                data = { username_or_email: query };
+            }
+
+            $.ajax({
+                url: '/search_user',
+                type: 'GET',
+                data: data,
+                success: function(response) {
+                    populateTable(response);
+                }
+            });
+        }
+
+        function populateTable(users) {
+            let tbody = document.querySelector("#userTable tbody");
+            tbody.innerHTML = "";
+
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">No users found</td></tr>`;
+                return;
+            }
+
+            users.forEach(user => {
+                let actionText = user.user_status === 'N' ? 'Activate' : 'Deactivate';
+                let actionClass = user.user_status === 'N' ? 'activate' : 'deactivate';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>${user.user_status}</td>
+                        <td>
+                            <button class="deactivate-btn ${actionClass}" onclick="toggleUserStatus(${user.id}, '${user.user_status}')">${actionText}</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function toggleUserStatus(userId, currentStatus) {
+            let newStatus = currentStatus === 'N' ? 'Y' : 'N'; 
+            let actionText = newStatus === 'N' ? 'Deactivate' : 'Activate';
+
+            if (!confirm(`Are you sure you want to ${actionText.toLowerCase()} this user?`)) return;
+
+            $.ajax({
+                url: '/toggle_user_status',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ user_id: userId, new_status: newStatus }),
+                success: function(response) {
+                    alert(response.message);
+                    searchUser();  
+                }
+            });
+        }
+    </script>
+</body>
+</html>

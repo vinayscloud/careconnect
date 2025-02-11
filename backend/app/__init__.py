@@ -22,9 +22,10 @@ def create_app():
     from app.routes.doctors import doctor_bp
     from app.routes.appointments import appointment_bp
     from app.routes.auth import auth_bp
-    
+    from app.routes.admin_user import admin_user_bp 
+
     app.register_blueprint(doctor_bp, url_prefix='/api/doctors')
     app.register_blueprint(appointment_bp)
     app.register_blueprint(auth_bp)
-
+    app.register_blueprint(admin_user_bp)
     return app
