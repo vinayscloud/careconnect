@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template, session, redirect, url_for
 import mysql.connector
 import hashlib
+import datetime
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -35,8 +36,7 @@ def login_page():
     print("[DEBUG] Rendering login page")
     return render_template('login.html')
 
-# ✅ Login API (with Session Storage & Success Message)
-# ✅ Login API (with Role-Based Redirection)
+# ✅ Login API (with Session Expiration & Role-Based Redirection)
 @auth_bp.route("/login", methods=["POST"])
 def login_user():
     print("[DEBUG] Received login request")
@@ -66,6 +66,9 @@ def login_user():
             session['user_id'] = user['id']
             session['username'] = user['username']
             session['role'] = user['role'].strip().lower()  # Ensure lowercase for consistency
+            
+            # ✅ Implement Session Expiration (30 minutes of inactivity)
+            session['last_active'] = datetime.datetime.utcnow().timestamp()
 
             print(f"[DEBUG] Login successful for user: {user['username']} with role: {session['role']}")
 
@@ -87,15 +90,35 @@ def login_user():
         cursor.close()
         conn.close()
 
-
-# ✅ Logout API (Clears Session)
-@auth_bp.route("/logout", methods=["GET"])
+# ✅ Logout API (Clears Session & Redirects)
+@auth_bp.route("/logout", methods=["GET", "POST"])
 def logout():
     print("[DEBUG] Logging out user")
     session.clear()
-    return jsonify({"message": "Logged out successfully!"}), 200
+    return jsonify({"message": "Logged out successfully!", "redirect": "/login"}), 200
 
-# ✅ Register API (Restored)
+# ✅ Session Expiration Check
+@auth_bp.route("/check_session", methods=["GET"])
+def check_session():
+    user_id = session.get("user_id")
+
+    if user_id:
+        last_active = session.get("last_active", 0)
+        current_time = datetime.datetime.utcnow().timestamp()
+        
+        # Check if session expired (30 minutes of inactivity)
+        if current_time - last_active > 1800:  # 1800 seconds = 30 minutes
+            print("[INFO] Session expired for user ID:", user_id)
+            session.clear()
+            return jsonify({"logged_in": False, "error": "Session expired"}), 401
+
+        # Update last activity time
+        session["last_active"] = current_time
+        return jsonify({"logged_in": True, "username": session["username"]}), 200
+
+    return jsonify({"logged_in": False}), 200
+
+# ✅ Register API (RESTORED with Security Fixes)
 @auth_bp.route("/register", methods=["POST"])
 def register_user():
     print("[DEBUG] Received registration request")
@@ -139,10 +162,3 @@ def register_user():
 def register_page():
     print("[DEBUG] Rendering register page")
     return render_template('register.html')
-
-
-@auth_bp.route("/check_session", methods=["GET"])
-def check_session():
-    if "user_id" in session:
-        return jsonify({"logged_in": True, "username": session["username"]}), 200
-    return jsonify({"logged_in": False}), 200
