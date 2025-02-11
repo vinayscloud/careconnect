@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify, render_template
 import mysql.connector
 import hashlib
+import jwt
+import datetime
+from functools import wraps
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -9,6 +12,9 @@ DB_HOST = "database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com"
 DB_USER = "admin"
 DB_PASSWORD = "Clod123456789"
 DB_NAME = "careconnect"
+
+# Secret key for JWT
+SECRET_KEY = "your_secret_key_here"
 
 def create_connection():
     print("[DEBUG] Attempting database connection...")
@@ -28,6 +34,38 @@ def create_connection():
 def hash_password(password):
     print("[DEBUG] Hashing password")
     return hashlib.sha256(password.encode()).hexdigest()
+
+def generate_jwt(user_id, username, role):
+    """Generates a JWT token with user details."""
+    payload = {
+        "id": user_id,
+        "username": username,
+        "role": role,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    return token
+
+def token_required(f):
+    """Decorator to protect routes requiring authentication."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get("Authorization")
+
+        if not token:
+            return jsonify({"error": "Token is missing"}), 401
+
+        try:
+            token = token.split("Bearer ")[-1]  # Extract token if "Bearer " prefix exists
+            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            request.user = data  # Attach user details to the request
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token has expired"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token"}), 401
+
+        return f(*args, **kwargs)
+    return decorated
 
 # Login Page
 @auth_bp.route("/login")
@@ -59,13 +97,21 @@ def login_user():
         print(f"[DEBUG] Checking user in database with email: {email}")
 
         cursor.execute("""
-            SELECT id, username FROM users WHERE email = %s AND password = %s
+            SELECT id, username, role FROM users WHERE email = %s AND password = %s
         """, (email, hashed_password))
         user = cursor.fetchone()
 
         if user:
-            print(f"[DEBUG] Login successful for user: {user[1]}")
-            return jsonify({"message": "Login successful", "user": {"id": user[0], "username": user[1]}}), 200
+            user_id, username, role = user
+            print(f"[DEBUG] Login successful for user: {username}")
+
+            token = generate_jwt(user_id, username, role)
+
+            return jsonify({
+                "message": "Login successful",
+                "token": token,
+                "user": {"id": user_id, "username": username, "role": role}
+            }), 200
         else:
             print("[ERROR] Invalid login credentials")
             return jsonify({"error": "Invalid credentials"}), 401
@@ -115,10 +161,16 @@ def register_user():
         cursor.close()
         conn.close()
 
+# Protected Route Example
+@auth_bp.route("/protected", methods=["GET"])
+@token_required
+def protected_route():
+    """Example of a protected route requiring JWT authentication."""
+    user = request.user
+    return jsonify({"message": "You have access!", "user": user})
+
 # Register Page
 @auth_bp.route("/register_page")
 def register_page():
     print("[DEBUG] Rendering register page")
     return render_template('register.html')
-
-
