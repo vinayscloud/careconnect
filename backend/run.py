@@ -51,6 +51,10 @@ def patient_dashboard():
 def doctor_dashboard():
     return render_template("doctor.html")
 
+@app.route('/patient-profile.html')
+def patient_profile():
+    return render_template("patient-profile.html")
+
 # ✅ Run the Flask App (No Routes After This)
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
