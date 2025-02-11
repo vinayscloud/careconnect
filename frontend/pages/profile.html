@@ -3,57 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Settings</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <title>Profile Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 
-    <div class="profile-container">
-        <h2 class="profile-title">Profile Settings</h2>
+    <h2>Welcome, {{ user.username }}</h2>
+    <p>Email: <span id="user-email">{{ user.email }}</span></p>
+    <p>Role: {{ user.role }}</p>
+    <p>Status: {{ user.user_status }}</p>
 
-        <div class="profile-card">
-            <form id="profileForm">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="full_name" disabled class="readonly">
-                </div>
+    <h3>Update Email</h3>
+    <input type="hidden" id="user-id" value="{{ user.id }}">
+    <input type="email" id="new-email" placeholder="Enter new email">
+    <button onclick="updateEmail()">Update Email</button>
+    <p id="email-status"></p>
 
-                <div class="form-group">
-                    <label>Email <i class="fas fa-pencil-alt edit-icon" onclick="makeEditable('email')"></i></label>
-                    <input type="email" id="email" readonly>
-                </div>
+    <h3>Change Password</h3>
+    <input type="password" id="old-password" placeholder="Enter old password">
+    <input type="password" id="new-password" placeholder="Enter new password">
+    <button onclick="updatePassword()">Change Password</button>
+    <p id="password-status"></p>
 
-                <div class="form-group">
-                    <label>Phone <i class="fas fa-pencil-alt edit-icon" onclick="makeEditable('phone')"></i></label>
-                    <input type="text" id="phone" readonly>
-                </div>
+    <script>
+        function updateEmail() {
+            var userId = $("#user-id").val();
+            var newEmail = $("#new-email").val();
 
-                <button type="submit" class="update-btn">Update Profile</button>
-                <p id="profileMessage"></p>
-            </form>
-        </div>
-
-        <h2 class="profile-title">Change Password</h2>
-        <div class="profile-card">
-            <form id="passwordForm">
-                <div class="form-group">
-                    <label>Old Password</label>
-                    <input type="password" id="old_password" required>
-                </div>
-
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="new_password" required>
-                </div>
-
-                <button type="submit" class="update-btn">Change Password</button>
-                <p id="passwordMessage"></p>
-            </form>
-        </div>
-    </div>
-
-    <script src="profile.js"></script>
+            $.post("/update_email", { user_id: userId, new_email: newEmail }, function(data) {
+                $("#email-status").text(data.message);
+                if (data.status === "success") {
+                    $("#user-email").text(newEmail);
+                }
+            });
+        }
+    </script>
 
 </body>
 </html>

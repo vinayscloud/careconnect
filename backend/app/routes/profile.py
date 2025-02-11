@@ -1,126 +1,69 @@
-from flask import Blueprint, request, jsonify, session
-import mysql.connector
+from flask import Blueprint, request, render_template, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.db_config import get_db_connection
 
 profile_bp = Blueprint('profile', __name__)
 
-# Database Configuration
-DB_CONFIG = {
-    "host": "database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com",
-    "user": "admin",
-    "password": "Clod123456789",
-    "database": "careconnect"
-}
-
-# Function to establish a database connection
-def get_db_connection():
-    return mysql.connector.connect(**DB_CONFIG)
-
-
 @profile_bp.route('/profile', methods=['GET'])
-def get_profile():
-    """Fetch user profile details and autofill existing information."""
-    user_id = session.get('user_id')
+def profile():
+    user_id = request.args.get('user_id')  # Passed as query param
+
     if not user_id:
-        return jsonify({'error': 'Unauthorized'}), 401
+        return jsonify({'message': 'User ID is required', 'status': 'error'})
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, username, email, role, user_status FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
 
-    try:
-        # Fetch user details from `users` table
-        cursor.execute("SELECT username, email, password FROM users WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
+    if not user:
+        return jsonify({'message': 'User not found', 'status': 'error'})
 
-        # Fetch additional patient profile details (excluding medical history)
-        cursor.execute("SELECT full_name, phone FROM patient_profiles WHERE user_id = %s", (user_id,))
-        profile = cursor.fetchone()
+    return render_template('profile.html', user=user)
 
-        if user and profile:
-            response = {
-                "full_name": profile["full_name"],  # Full Name should not be editable
-                "email": user["email"],
-                "phone": profile["phone"],
-                "current_password": user["password"]
-            }
-            return jsonify(response), 200
-        else:
-            return jsonify({'error': 'Profile not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
+@profile_bp.route('/update_email', methods=['POST'])
+def update_email():
+    user_id = request.form.get('user_id')
+    new_email = request.form.get('new_email')
 
-
-@profile_bp.route('/profile/update', methods=['POST'])
-def update_profile():
-    """Allow users to edit only Email and Phone."""
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    data = request.json
-    phone = data.get('phone')
-    email = data.get('email')
+    if not user_id or not new_email:
+        return jsonify({'message': 'User ID and Email are required', 'status': 'error'})
 
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute("UPDATE users SET email = %s WHERE id = %s", (new_email, user_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-    try:
-        # Update `users` table (email)
-        cursor.execute("UPDATE users SET email = %s WHERE id = %s", (email, user_id))
+    return jsonify({'message': 'Email updated successfully', 'status': 'success'})
 
-        # Update `patient_profiles` table (phone only)
-        cursor.execute("UPDATE patient_profiles SET phone = %s WHERE user_id = %s", (phone, user_id))
+@profile_bp.route('/update_password', methods=['POST'])
+def update_password():
+    user_id = request.form.get('user_id')
+    old_password = request.form.get('old_password')
+    new_password = request.form.get('new_password')
 
-        conn.commit()
-        return jsonify({'message': 'Profile updated successfully'}), 200
-
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@profile_bp.route('/profile/change-password', methods=['POST'])
-def change_password():
-    """Allow password change only if the new password is different from the current one."""
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    data = request.json
-    old_password = data.get('old_password')
-    new_password = data.get('new_password')
+    if not user_id or not old_password or not new_password:
+        return jsonify({'message': 'All fields are required', 'status': 'error'})
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
 
-    try:
-        # Fetch the current password
-        cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
+    if not user or not check_password_hash(user['password'], old_password):
+        return jsonify({'message': 'Old password is incorrect', 'status': 'error'})
 
-        if not user or not check_password_hash(user['password'], old_password):
-            return jsonify({'error': 'Incorrect old password'}), 400
+    # Hash new password and update in DB
+    new_password_hash = generate_password_hash(new_password)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET password = %s WHERE id = %s", (new_password_hash, user_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-        if check_password_hash(user['password'], new_password):
-            return jsonify({'error': 'New password cannot be the same as the current password'}), 400
-
-        # Hash new password
-        hashed_password = generate_password_hash(new_password)
-
-        # Update password
-        cursor.execute("UPDATE users SET password = %s WHERE id = %s", (hashed_password, user_id))
-        conn.commit()
-
-        return jsonify({'message': 'Password updated successfully'}), 200
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
+    return jsonify({'message': 'Password updated successfully', 'status': 'success'})
