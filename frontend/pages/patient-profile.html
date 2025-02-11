@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/patient-profile.css') }}">
+</head>
+<body>
+    <div class="profile-container">
+        <h1>Patient Profile</h1>
+        <p><strong>Name:</strong> <span id="name"></span></p>
+        <p><strong>Email:</strong> <span id="email"></span></p>
+        <p><strong>Phone:</strong> <input type="text" id="phone"></p>
+        <p><strong>Medical History:</strong> <textarea id="medical_history"></textarea></p>
+        <p><strong>Address:</strong> <input type="text" id="address"></p>
+        
+        <button id="create-profile">Create Profile</button>
+        <button id="update-profile">Update Profile</button>
+        <button id="delete-profile" class="delete-btn">Delete Profile</button>
+    </div>
+
+    <script>
+        async function loadProfile() {
+            const response = await fetch("/profile");
+            const data = await response.json();
+            
+            if (response.ok) {
+                document.getElementById("name").textContent = data.name;
+                document.getElementById("email").textContent = data.email;
+                document.getElementById("phone").value = data.phone || "";
+                document.getElementById("medical_history").value = data.medical_history || "";
+                document.getElementById("address").value = data.address || "";
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function createProfile() {
+            const phone = document.getElementById("phone").value;
+            const medical_history = document.getElementById("medical_history").value;
+            const address = document.getElementById("address").value;
+
+            const response = await fetch("/profile/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone, medical_history, address })
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        async function updateProfile() {
+            const phone = document.getElementById("phone").value;
+            const medical_history = document.getElementById("medical_history").value;
+            const address = document.getElementById("address").value;
+
+            const response = await fetch("/profile/update", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone, medical_history, address })
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        async function deleteProfile() {
+            const confirmDelete = confirm("Are you sure you want to delete your profile?");
+            if (!confirmDelete) return;
+
+            const response = await fetch("/profile/delete", { method: "DELETE" });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            if (response.ok) window.location.reload();
+        }
+
+        document.getElementById("create-profile").addEventListener("click", createProfile);
+        document.getElementById("update-profile").addEventListener("click", updateProfile);
+        document.getElementById("delete-profile").addEventListener("click", deleteProfile);
+
+        loadProfile();
+    </script>
+</body>
+</html>
