@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request, jsonify, render_template
 import mysql.connector
 import hashlib
@@ -7,14 +8,21 @@ from functools import wraps
 
 auth_bp = Blueprint('auth', __name__)
 
+# ------------------------------------------------------------------------------
 # Database Configuration
+# ------------------------------------------------------------------------------
 DB_HOST = "database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com"
 DB_USER = "admin"
 DB_PASSWORD = "Clod123456789"
 DB_NAME = "careconnect"
 
+# ------------------------------------------------------------------------------
 # Secret key for JWT
-SECRET_KEY = "your_secret_key_here"
+# If 'SECRET_KEY' is not set in the environment, fallback to "my_hardcoded_key_for_testing_only".
+# In a production environment, you should set SECRET_KEY as an environment variable.
+# ------------------------------------------------------------------------------
+SECRET_KEY = os.environ.get("SECRET_KEY", "my_hardcoded_key_for_testing_only")
+print("Using SECRET_KEY:", SECRET_KEY)
 
 def create_connection():
     print("[DEBUG] Attempting database connection...")
@@ -51,12 +59,12 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get("Authorization")
-
         if not token:
             return jsonify({"error": "Token is missing"}), 401
 
         try:
-            token = token.split("Bearer ")[-1]  # Extract token if "Bearer " prefix exists
+            # If token has "Bearer " prefix, split it out
+            token = token.split("Bearer ")[-1]
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             request.user = data  # Attach user details to the request
         except jwt.ExpiredSignatureError:
@@ -66,6 +74,10 @@ def token_required(f):
 
         return f(*args, **kwargs)
     return decorated
+
+# ------------------------------------------------------------------------------
+# Routes
+# ------------------------------------------------------------------------------
 
 # Login Page
 @auth_bp.route("/login")
