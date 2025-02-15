@@ -43,7 +43,10 @@ def token_required(f):
     return decorated
 
 
-# Login Page
+
+
+
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login_page():
     if request.method == 'POST':
@@ -57,9 +60,18 @@ def login_page():
         cursor.close()
         conn.close()
 
-        if not user or not check_password_hash(user['password'], password):
+        if not user:
             return render_template('login.html', error="Invalid credentials")
 
+        # Check if the user is deactivated
+        if user['user_status'] == 'N':
+            return render_template('login.html', error="Your account is deactivated.")
+
+        # Verify password
+        if not check_password_hash(user['password'], password):
+            return render_template('login.html', error="Invalid credentials")
+
+        # Generate JWT Token
         token = jwt.encode(
             {'user_id': user['id'], 'exp': datetime.utcnow() + timedelta(hours=1)},
             'd28ab6f8995286e60aed281a574c18a03ff99490de1ab1f6',
@@ -70,6 +82,7 @@ def login_page():
         return redirect(url_for('auth.dashboard'))
 
     return render_template('login.html')
+
 
 # Signup Page
 @auth_bp.route('/signup', methods=['GET', 'POST'])
