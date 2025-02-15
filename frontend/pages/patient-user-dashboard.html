@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal - CareConnect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/patient-dashboard.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand">CareConnect</div>
+        <div class="nav-links">
+            <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Search Doctors</a>
+            <a href="{{ url_for('auth.logout') }}" onclick="return confirm('Are you sure you want to logout?')">Logout</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <img src="{{ url_for('static', filename='images/healthcare-hero.jpg') }}" alt="Healthcare Hero">
+        <div class="hero-content">
+            <h1>Welcome to Your Patient Portal</h1>
+            <p>Manage your health with easy access to doctors.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -15,25 +15,26 @@
       <div class="brand">CareConnect</div>
       <div class="nav-links">
         <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('load_page', page_name='doctor-profile') }}"
-          >Doctors</a
-        >
+        <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a>
         <a href="{{ url_for('load_page', page_name='notifications') }}">
           <div class="notifications">
             <span class="icon">🔔</span>
           </div>
         </a>
-        <a href="{{ url_for('load_page', page_name='login') }}">Login</a>
+
+        {% if session['token'] %}
+          <a href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a>
+        {% else %}
+          <a href="{{ url_for('load_page', page_name='login') }}">Login</a>
+        {% endif %}
       </div>
     </div>
 
     <!-- Search and Filter Section -->
     <div class="search-container">
       <div class="search-bar">
-        <!-- Search by Name -->
         <input type="text" id="searchInput" placeholder="Search by name..." />
 
-        <!-- Specialty Filter -->
         <select id="specialtyFilter" class="filter-dropdown">
           <option value="">All Specialties</option>
           <option value="Cardiologist">Cardiologist</option>
@@ -42,7 +43,6 @@
           <option value="Pediatrician">Pediatrician</option>
         </select>
 
-        <!-- City Filter -->
         <select id="cityFilter" class="filter-dropdown">
           <option value="">All Cities</option>
           <option value="New York">New York</option>
@@ -50,7 +50,6 @@
           <option value="Chicago">Chicago</option>
         </select>
 
-        <!-- Experience Filter -->
         <input
           type="number"
           id="experienceFilter"
@@ -59,7 +58,6 @@
           min="0"
         />
 
-        <!-- Rating Filter -->
         <input
           type="number"
           id="ratingFilter"
@@ -83,67 +81,59 @@
     <div class="doctor-profiles-container" id="doctorProfiles"></div>
 
     <script>
+      // Logout confirmation function
+      function confirmLogout() {
+          return confirm("Are you sure you want to logout?");
+      }
+
       // Fetch doctors from API with filters
       async function fetchDoctors() {
         document.getElementById("loading").style.display = "block";
 
-        // Get filter values
-        const searchQuery = document
-          .getElementById("searchInput")
-          .value.toLowerCase();
+        const searchQuery = document.getElementById("searchInput").value.toLowerCase();
         const specialty = document.getElementById("specialtyFilter").value;
         const city = document.getElementById("cityFilter").value;
         const minExperience = document.getElementById("experienceFilter").value;
         const minRating = document.getElementById("ratingFilter").value;
 
-        // Construct API query parameters
         let queryParams = `?search=${searchQuery}`;
         if (specialty) queryParams += `&specialty=${specialty}`;
         if (city) queryParams += `&city=${city}`;
         if (minExperience) queryParams += `&min_experience=${minExperience}`;
         if (minRating) queryParams += `&min_rating=${minRating}`;
 
-        // Fetch from API
         const response = await fetch(`/api/doctors${queryParams}`);
         const doctors = await response.json();
 
-        // Hide loading indicator and render doctors
         document.getElementById("loading").style.display = "none";
         renderDoctors(doctors);
       }
 
-      // Render doctor profiles dynamically
       function renderDoctors(doctors) {
         const profilesContainer = document.getElementById("doctorProfiles");
-        profilesContainer.innerHTML = doctors.length
-          ? ""
-          : "<p>No doctors found.</p>";
+        profilesContainer.innerHTML = doctors.length ? "" : "<p>No doctors found.</p>";
         doctors.forEach((doctor) => {
           const doctorCard = document.createElement("div");
           doctorCard.className = "doctor-profile";
           doctorCard.innerHTML = `
-                      <div class="doctor-photo">
-                          <img src="${doctor.image}" alt="${doctor.name}">
-                      </div>
-                      <div class="doctor-details">
-                          <h1>${doctor.name}</h1>
-                          <p><strong>Specialty:</strong> ${doctor.specialty}</p>
-                          <p><strong>Location:</strong> ${doctor.location}</p>
-                          <p><strong>Experience:</strong> ${doctor.experience} years</p>
-                          <div class="rating">★ ${doctor.rating}/5</div>
-                          <a href="/booking-form?doctorId=${doctor.id}" class="book-appointment">Book Appointment</a>
-                      </div>
-                  `;
+            <div class="doctor-photo">
+                <img src="${doctor.image}" alt="${doctor.name}">
+            </div>
+            <div class="doctor-details">
+                <h1>${doctor.name}</h1>
+                <p><strong>Specialty:</strong> ${doctor.specialty}</p>
+                <p><strong>Location:</strong> ${doctor.location}</p>
+                <p><strong>Experience:</strong> ${doctor.experience} years</p>
+                <div class="rating">★ ${doctor.rating}/5</div>
+                <a href="/booking-form?doctorId=${doctor.id}" class="book-appointment">Book Appointment</a>
+            </div>
+          `;
           profilesContainer.appendChild(doctorCard);
         });
       }
 
-      // Search functionality on button click
-      document
-        .getElementById("searchButton")
-        .addEventListener("click", fetchDoctors);
+      document.getElementById("searchButton").addEventListener("click", fetchDoctors);
 
-      // Initial load
       fetchDoctors();
     </script>
   </body>

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template
 import mysql.connector
 from flask_cors import CORS
+from app.routes.auth import token_required
 
 # MySQL Database Configuration (Hardcoded)
 db_config = {
@@ -13,7 +14,9 @@ db_config = {
 appointments_bp = Blueprint('appointments', __name__)
 
 # Route to handle both GET and POST methods
+
 @appointments_bp.route('/booking-form', methods=['GET', 'POST'])
+@token_required
 def booking_form():
     if request.method == 'GET':
         doctor_id = request.args.get('doctorId')  # Retrieve doctorId from URL parameters

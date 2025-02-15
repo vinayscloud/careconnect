@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Dashboard - CareConnect</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f5f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .navbar {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .navbar .brand {
+        font-size: 1.5rem;
+        color: #007bff;
+        font-weight: bold;
+      }
+
+      .navbar .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .navbar .nav-links a {
+        text-decoration: none;
+        color: #333;
+        font-size: 1rem;
+        padding: 0.5rem;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .navbar .nav-links a:hover {
+        background-color: #007bff;
+        color: #fff;
+      }
+
+      .container {
+        max-width: 1200px;
+        width: 100%;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #333;
+      }
+
+      .dashboard-nav {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .dashboard-nav a {
+        background-color: #007bff;
+        color: #fff;
+        padding: 1rem 2rem;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+      }
+
+      .dashboard-nav a:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navbar Section -->
+    <div class="navbar">
+      <div class="brand">CareConnect</div>
+      <div class="nav-links">
+        <a href="{{ request.path }}">Home</a> <!-- Refreshes the same page -->
+        <a href="{{ url_for('load_page', page_name='notifications') }}">
+          <div class="notifications">
+            <span class="icon">🔔</span>
+          </div>
+        </a>
+
+        {% if session['token'] %}
+          <a href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a>
+        {% else %}
+          <a href="{{ url_for('load_page', page_name='login') }}">Login</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Doctor Dashboard -->
+    <div class="container">
+      <h1>Welcome, Dr. {{ user['username'] }}</h1>
+      <p>Your personalized doctor dashboard</p>
+
+      <!-- Doctor Navigation -->
+      <div class="dashboard-nav">
+        <a href="{{ url_for('load_page', page_name='update-availability') }}">Update Availability</a>
+        <a href="{{ url_for('load_page', page_name='view-appointments') }}">View Appointments</a>
+        <a href="{{ url_for('load_page', page_name='manage-patients') }}">Manage Patients</a>
+      </div>
+
+      <p>Manage your schedule, view appointments, and coordinate with patients.</p>
+    </div>
+
+    <script>
+      // Logout confirmation function
+      function confirmLogout() {
+        return confirm("Are you sure you want to logout?");
+      }
+    </script>
+  </body>
+</html>

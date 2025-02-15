@@ -1,104 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Responsive Login Page</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles/login.css') }}"
-    />
-    <style>
-      .error-message {
-        color: red;
-        font-size: 0.9rem;
-        margin-bottom: 10px;
-      }
-      #login-error {
-        text-align: center;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-container">
-      <h1>Login</h1>
-      <div id="login-error" class="error-message"></div>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Enter your email" required />
-          <small class="error-message" id="email-error"></small>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" placeholder="Enter your password" required />
-          <small class="error-message" id="password-error"></small>
-        </div>
-        <button type="submit" class="btn">Login</button>
-      </form>
-      <div class="forgot-password">
-        <a href="#">Forgot Password?</a>
-      </div>
-      <div class="not-a-member">
-        <a href="/register_page">Sign Up</a>
-      </div>
-    </div>
 
-    <script>
-      document.getElementById("login-form").addEventListener("submit", async function (event) {
-        event.preventDefault();
-        
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const emailError = document.getElementById("email-error");
-        const passwordError = document.getElementById("password-error");
-        const loginError = document.getElementById("login-error");
-        
-        emailError.textContent = "";
-        passwordError.textContent = "";
-        loginError.textContent = "";
-        
-        let valid = true;
-        
-        // Email validation
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(email)) {
-          emailError.textContent = "Please enter a valid email address.";
-          valid = false;
-        }
-        
-        // Password validation
-        if (password.length < 6) {
-          passwordError.textContent = "Password must be at least 6 characters.";
-          valid = false;
-        }
-        
-        if (!valid) return;
-        
-        try {
-          const response = await fetch("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-          });
-          
-          const contentType = response.headers.get("Content-Type");
-          if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Invalid response format");
-          }
-          
-          const result = await response.json();
-          if (response.ok) {
-            window.location.href = "/";
-          } else {
-            loginError.textContent = result.error || "Login failed";
-          }
-        } catch (error) {
-          console.error("Login error:", error);
-          loginError.textContent = "Server error. Please try again later.";
-        }
-      });
-    </script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CareConnect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>Login to CareConnect</h1>
+        <form method="POST" action="{{ url_for('auth.login_page') }}">
+            {% if error %}
+            <div style="color: red; text-align: center; margin-bottom: 1rem;">{{ error }}</div>
+            {% endif %}
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="forgot-password">
+            <a href="#">Forgot password?</a>
+        </div>
+        <div class="not-a-member">
+            <p>Not a member? <a href="{{ url_for('auth.signup_page') }}">Sign up</a></p>
+        </div>
+    </div>
+</body>
+
 </html>

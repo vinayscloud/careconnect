@@ -1,188 +1,167 @@
-import os
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 import mysql.connector
-import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
-import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 
+# Create a Blueprint for the 'auth' module
 auth_bp = Blueprint('auth', __name__)
 
-# ------------------------------------------------------------------------------
-# Database Configuration
-# ------------------------------------------------------------------------------
-DB_HOST = "database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com"
-DB_USER = "admin"
-DB_PASSWORD = "Clod123456789"
-DB_NAME = "careconnect"
+# Connect to MySQL
+def get_db_connection():
+    return mysql.connector.connect(
+        user='admin',
+        host='database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com',
+        password='Clod123456789',
+        database='careconnect'
+    )
 
-# ------------------------------------------------------------------------------
-# Secret key for JWT
-# If 'SECRET_KEY' is not set in the environment, fallback to "my_hardcoded_key_for_testing_only".
-# In a production environment, you should set SECRET_KEY as an environment variable.
-# ------------------------------------------------------------------------------
-SECRET_KEY = os.environ.get("SECRET_KEY", "my_hardcoded_key_for_testing_only")
-print("Using SECRET_KEY:", SECRET_KEY)
-
-def create_connection():
-    print("[DEBUG] Attempting database connection...")
-    try:
-        conn = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        print("[DEBUG] Database connection successful")
-        return conn
-    except mysql.connector.Error as e:
-        print(f"[ERROR] Database connection failed: {e}")
-        return None
-
-def hash_password(password):
-    print("[DEBUG] Hashing password")
-    return hashlib.sha256(password.encode()).hexdigest()
-
-def generate_jwt(user_id, username, role):
-    """Generates a JWT token with user details."""
-    payload = {
-        "id": user_id,
-        "username": username,
-        "role": role,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-    }
-    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-    return token
-
+# JWT Token Verification Decorator
 def token_required(f):
-    """Decorator to protect routes requiring authentication."""
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.headers.get("Authorization")
+        token = session.get('token')
         if not token:
-            return jsonify({"error": "Token is missing"}), 401
-
+            return redirect(url_for('auth.login_page'))
         try:
-            # If token has "Bearer " prefix, split it out
-            token = token.split("Bearer ")[-1]
-            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            request.user = data  # Attach user details to the request
+            data = jwt.decode(token, 'd28ab6f8995286e60aed281a574c18a03ff99490de1ab1f6', algorithms=["HS256"])
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
+            current_user = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if not current_user:
+                return redirect(url_for('auth.login_page'))
         except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token has expired"}), 401
+            return redirect(url_for('auth.login_page'))
         except jwt.InvalidTokenError:
-            return jsonify({"error": "Invalid token"}), 401
+            return redirect(url_for('auth.login_page'))
 
-        return f(*args, **kwargs)
+        return f(current_user, *args, **kwargs)
     return decorated
 
-# ------------------------------------------------------------------------------
-# Routes
-# ------------------------------------------------------------------------------
 
 # Login Page
-@auth_bp.route("/login")
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login_page():
-    print("[DEBUG] Rendering login page")
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not user or not check_password_hash(user['password'], password):
+            return render_template('login.html', error="Invalid credentials")
+
+        token = jwt.encode(
+            {'user_id': user['id'], 'exp': datetime.utcnow() + timedelta(hours=1)},
+            'd28ab6f8995286e60aed281a574c18a03ff99490de1ab1f6',
+            algorithm="HS256"
+        )
+
+        session['token'] = token  # Store JWT in session
+        return redirect(url_for('auth.dashboard'))
+
     return render_template('login.html')
 
-# Login API
-@auth_bp.route("/login", methods=["POST"])
-def login_user():
-    print("[DEBUG] Received login request")
-    data = request.json
-    print(f"[DEBUG] Login data received: {data}")
+# Signup Page
+@auth_bp.route('/signup', methods=['GET', 'POST'])
+def signup_page():
+    if request.method == 'POST':
+        if request.is_json:  # Handling JSON request
+            data = request.get_json()
+            username = data.get('username')
+            email = data.get('email')
+            password = data.get('password')
+            role = data.get('role')
+            hashed_password = generate_password_hash(password)
 
-    email = data.get("email")
-    password = data.get("password")
+            conn = get_db_connection()
+            cursor = conn.cursor()
 
-    if not email or not password:
-        print("[ERROR] Missing email or password")
-        return jsonify({"error": "Missing required fields"}), 400
+            # Check if user already exists
+            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                return jsonify({'error': "User already exists!"}), 400
 
-    conn = create_connection()
-    if conn is None:
-        return jsonify({"error": "Database connection failed"}), 500
+            # Insert new user
+            cursor.execute(
+                "INSERT INTO users (username, email, password, role, user_status) VALUES (%s, %s, %s, %s, %s)",
+                (username, email, hashed_password, role, 'active')
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
 
-    try:
-        cursor = conn.cursor()
-        hashed_password = hash_password(password)
-        print(f"[DEBUG] Checking user in database with email: {email}")
+            return jsonify({'message': 'User created successfully!'}), 201
 
-        cursor.execute("""
-            SELECT id, username, role FROM users WHERE email = %s AND password = %s
-        """, (email, hashed_password))
-        user = cursor.fetchone()
+        else:  # Handling form submission (if necessary)
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            role = request.form['role']
+            hashed_password = generate_password_hash(password)
 
-        if user:
-            user_id, username, role = user
-            print(f"[DEBUG] Login successful for user: {username}")
+            conn = get_db_connection()
+            cursor = conn.cursor()
 
-            token = generate_jwt(user_id, username, role)
+            # Check if user already exists
+            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                return render_template('signup.html', error="User already exists!")
 
-            return jsonify({
-                "message": "Login successful",
-                "token": token,
-                "user": {"id": user_id, "username": username, "role": role}
-            }), 200
-        else:
-            print("[ERROR] Invalid login credentials")
-            return jsonify({"error": "Invalid credentials"}), 401
-    except mysql.connector.Error as e:
-        print(f"[ERROR] Database error during login: {e}")
-        return jsonify({"error": f"Database error: {e}"}), 500
-    finally:
-        cursor.close()
-        conn.close()
+            # Insert new user
+            cursor.execute(
+                "INSERT INTO users (username, email, password, role, user_status) VALUES (%s, %s, %s, %s, %s)",
+                (username, email, hashed_password, role, 'active')
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
 
-# Register API
-@auth_bp.route("/register", methods=["POST"])
-def register_user():
-    print("[DEBUG] Received registration request")
-    data = request.json
-    print(f"[DEBUG] Registration data received: {data}")
+            return redirect(url_for('auth.login_page'))
 
-    username = data.get("username")
-    email = data.get("email")
-    role = data.get("role")
-    password = data.get("password")
+    return render_template('signup.html')
 
-    if not username or not email or not password:
-        print("[ERROR] Missing username, email, or password")
-        return jsonify({"error": "Missing required fields"}), 400
-
-    conn = create_connection()
-    if conn is None:
-        return jsonify({"error": "Database connection failed"}), 500
-
-    try:
-        cursor = conn.cursor()
-        hashed_password = hash_password(password)
-        print(f"[DEBUG] Registering user: {username}, Email: {email}")
-
-        cursor.execute("""
-            INSERT INTO users (username, email, password, role) VALUES (%s, %s, %s, %s)
-        """, (username, email, hashed_password, role))
-        conn.commit()
-
-        print(f"[DEBUG] User {username} registered successfully")
-        return jsonify({"message": "User registered successfully"}), 201
-    except mysql.connector.Error as e:
-        print(f"[ERROR] Database error during registration: {e}")
-        return jsonify({"error": f"Database error: {e}"}), 500
-    finally:
-        cursor.close()
-        conn.close()
-
-# Protected Route Example
-@auth_bp.route("/protected", methods=["GET"])
+# Dashboard (Protected)
+@auth_bp.route('/dashboard', methods=['GET'])
 @token_required
-def protected_route():
-    """Example of a protected route requiring JWT authentication."""
-    user = request.user
-    return jsonify({"message": "You have access!", "user": user})
+def dashboard(current_user):
+    if current_user['role'] == 'patient':
+        return render_template('patient-user-dashboard.html', user=current_user)
+    elif current_user['role'] == 'doctor':
+        return render_template('doctor-user-dashboard.html', user=current_user)
+    elif current_user['role'] == 'admin':
+        return render_template('admin-user-dashboard.html', user=current_user)
+    else:
+        return redirect(url_for('auth.login_page'))
 
-# Register Page
-@auth_bp.route("/register_page")
-def register_page():
-    print("[DEBUG] Rendering register page")
-    return render_template('register.html')
+# Logout
+@auth_bp.route('/logout')
+def logout():
+    session.pop('token', None)
+    return redirect(url_for('auth.login_page'))
+
+
+@auth_bp.route('/api/check-auth')
+def check_auth():
+    token = session.get('token')
+    if token:
+        try:
+            jwt.decode(token, 'd28ab6f8995286e60aed281a574c18a03ff99490de1ab1f6', algorithms=["HS256"])
+            return jsonify({'isAuthenticated': True})
+        except jwt.ExpiredSignatureError:
+            session.pop('token', None)  # Remove expired token
+        except jwt.InvalidTokenError:
+            session.pop('token', None)  # Remove invalid token
+
+    return jsonify({'isAuthenticated': False})

@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin User Management</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href= "{{ url_for('static', filename='styles/admin-user-dashboard.css') }}"> <!-- Link to External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin-user-dashboard.css') }}"> <!-- Link to External CSS -->
 </head>
 <body>
-    <h2>Super Admin - Manage Users</h2>
+    <!-- Header with Logout Button -->
+    <div id="header">
+        <h2>Super Admin - Manage Users</h2>
+        <button id="logout-btn" onclick="logoutUser()">Logout</button>
+    </div>
 
     <div id="search-container">
         <input type="text" id="searchInput" placeholder="Search by User ID or Username/Email">
@@ -97,6 +101,12 @@
                     searchUser();  
                 }
             });
+        }
+
+        function logoutUser() {
+            if (confirm("Are you sure you want to logout?")) {
+                window.location.href = "{{ url_for('auth.logout') }}";
+            }
         }
     </script>
 </body>

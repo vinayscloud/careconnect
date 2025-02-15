@@ -44,6 +44,9 @@ def load_page(page_name):
         return "Page not found", 404
 
 
+
+app.secret_key = "d28ab6f8995286e60aed281a574c18a03ff99490de1ab1f6" 
+
 # ✅ Run the Flask App
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -152,6 +152,7 @@
   </head>
 
   <body>
+    <!-- Navbar Section -->
     <div class="navbar">
       <div class="brand">CareConnect</div>
       <div class="nav-links">
@@ -162,10 +163,16 @@
             <span class="icon">🔔</span>
           </div>
         </a>
-        <a href="{{ url_for('load_page', page_name='login') }}">Login</a>
+
+        {% if session['token'] %}
+          <a href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a>
+        {% else %}
+          <a href="{{ url_for('load_page', page_name='login') }}">Login</a>
+        {% endif %}
       </div>
     </div>
-  
+
+    <!-- Hero Section -->
     <div class="hero">
       <img src="{{ url_for('static', filename='images/bg-banner.JPG') }}" alt="Healthcare Hero" />
       <div class="hero-content">
@@ -177,7 +184,8 @@
         <a href="#">Learn more</a>
       </div>
     </div>
-  
+
+    <!-- Features Section -->
     <div class="features">
       <div class="feature">
         <img src="{{ url_for('static', filename='images/coordinated care.jpg') }}" alt="Feature 1" />
@@ -195,8 +203,12 @@
         <p>Connecting you to care when you need it most.</p>
       </div>
     </div>
+
+    <script>
+      // Logout confirmation function
+      function confirmLogout() {
+          return confirm("Are you sure you want to logout?");
+      }
+    </script>
   </body>
-  
-
-
 </html>
