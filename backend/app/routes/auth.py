@@ -4,18 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta
 from functools import wraps
+from app.db_config import db_config,get_db_connection
 
 # Create a Blueprint for the 'auth' module
 auth_bp = Blueprint('auth', __name__)
 
-# Connect to MySQL
-def get_db_connection():
-    return mysql.connector.connect(
-        user='admin',
-        host='database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com',
-        password='Clod123456789',
-        database='careconnect'
-    )
 
 # JWT Token Verification Decorator
 def token_required(f):

@@ -1,3 +1,0 @@
-variable "resource" {
-  type     = string
-}

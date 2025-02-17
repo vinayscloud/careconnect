@@ -2,14 +2,7 @@ from flask import Blueprint, request, jsonify, render_template
 import mysql.connector
 from flask_cors import CORS
 from app.routes.auth import token_required
-
-# MySQL Database Configuration (Hardcoded)
-db_config = {
-    "host": "database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com",
-    "user": "admin",
-    "password": "Clod123456789",
-    "database": "careconnect"
-}
+from app.db_config import db_config, get_db_connection
 
 appointments_bp = Blueprint('appointments', __name__)
 
@@ -26,7 +19,7 @@ def booking_form():
 
         # Directly using mysql.connector.connect for database connection
         try:
-            conn = mysql.connector.connect(**db_config)
+            conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT * FROM doctors WHERE id = %s", (doctor_id,))
             doctor = cursor.fetchone()
@@ -58,7 +51,7 @@ def booking_form():
             notes = data.get('notes')
 
             # Insert appointment details into the database
-            conn = mysql.connector.connect(**db_config)
+            conn = get_db_connection()
             cursor = conn.cursor()
 
             # Insert query for appointments table

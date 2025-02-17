@@ -1,19 +1,9 @@
 from flask import Blueprint, request, jsonify
 import mysql.connector
 from flask_cors import CORS
+from app.db_config import db_config, get_db_connection
 
 admin_user_bp = Blueprint('admin_user', __name__)
-
-# Database Configuration
-db_config = {
-    "host": "database-1.cm1p8c8kitx3.us-east-1.rds.amazonaws.com",
-    "user": "admin",
-    "password": "Clod123456789",
-    "database": "careconnect"
-}
-
-def get_db_connection():
-    return mysql.connector.connect(**db_config)
 
 
 @admin_user_bp.route('/search_user', methods=['GET'])

@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.services.doctor_service import DoctorService
+import mysql.connector
+from app.db_config import get_db_connection
 
 doctors_bp = Blueprint("doctors", __name__)
 
@@ -12,9 +13,41 @@ def get_doctors():
         "min_experience": request.args.get("min_experience", ""),
         "min_rating": request.args.get("min_rating", ""),
     }
-    
+
     try:
-        doctors = DoctorService.get_doctors(filters)
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = "SELECT id, name, specialty, location, experience, rating FROM doctors WHERE 1=1"
+        params = []
+
+        if filters["search"]:
+            query += " AND LOWER(name) LIKE %s"
+            params.append(f"%{filters['search']}%")
+        
+        if filters["specialty"]:
+            query += " AND LOWER(specialty) LIKE %s"
+            params.append(f"%{filters['specialty']}%")
+        
+        if filters["city"]:
+            query += " AND LOWER(location) LIKE %s"
+            params.append(f"%{filters['city']}%")
+
+        if filters["min_experience"]:
+            query += " AND experience >= %s"
+            params.append(int(filters["min_experience"]))
+
+        if filters["min_rating"]:
+            query += " AND rating >= %s"
+            params.append(float(filters["min_rating"]))
+
+        cursor.execute(query, tuple(params))
+        doctors = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
         return jsonify(doctors)
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500

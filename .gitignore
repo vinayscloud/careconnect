@@ -5,6 +5,10 @@ terraform.tfstate.backup
 .terraform/
 .terraform*
 
+__pycache__/
+
+
+
 # Crash log files
 crash.log
 
@@ -21,3 +25,5 @@ override.tf.json
 
 # .terraform.lock.hcl
 .terraform.lock.hcl
+
+.venv/
