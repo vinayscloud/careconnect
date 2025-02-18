@@ -10,35 +10,36 @@ from app.db_config import db_config,get_db_connection
 auth_bp = Blueprint('auth', __name__)
 
 
-# JWT Token Verification Decorator
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = session.get('token')
+        token = session.get('token')  # Retrieve token from session
+
         if not token:
-            return redirect(url_for('auth.login_page'))
+            return redirect(url_for('auth.login_page'))  # Redirect to login if no token
+        
         try:
             data = jwt.decode(token, 'd28ab6f8995286e60aed281a574c18a03ff99490de1ab1f6', algorithms=["HS256"])
+            
+            # Fetch user details from database
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT * FROM users WHERE id = %s", (data['user_id'],))
             current_user = cursor.fetchone()
             cursor.close()
             conn.close()
+
             if not current_user:
-                return redirect(url_for('auth.login_page'))
+                return redirect(url_for('auth.login_page'))  # Redirect if user not found
+
         except jwt.ExpiredSignatureError:
-            return redirect(url_for('auth.login_page'))
+            return redirect(url_for('auth.login_page'))  # Token expired
         except jwt.InvalidTokenError:
-            return redirect(url_for('auth.login_page'))
+            return redirect(url_for('auth.login_page'))  # Token invalid
 
-        return f(current_user, *args, **kwargs)
+        return f(current_user, *args, **kwargs)  # Pass user details to the function
+
     return decorated
-
-
-
-
-
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login_page():

@@ -10,39 +10,22 @@
     <div class="appointment-form">
       <h1>Book an Appointment</h1>
       <form id="appointment-form">
-        <!-- Hidden Fields for Doctor Details -->
-        <input type="hidden" id="doctorId" name="doctorId" />
-        <input type="hidden" id="doctorName" name="doctorName" />
+        <!-- Hidden Fields for Doctor & Patient Details -->
+        <input type="hidden" id="doctorId" name="doctorId" value="{{ doctor.id }}" />
+        <input type="hidden" id="doctorName" name="doctorName" value="{{ doctor.name }}" />
+        <input type="hidden" id="patientId" name="patientId" value="{{ patient_id }}" />
 
         <div class="form-group">
           <label for="name">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            required
-            placeholder="Enter your full name"
-          />
+          <input type="text" id="name" name="name" required placeholder="Enter your full name" />
         </div>
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            placeholder="Enter your email address"
-          />
+          <input type="email" id="email" name="email" required placeholder="Enter your email address" />
         </div>
         <div class="form-group">
           <label for="phone">Phone Number</label>
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            required
-            placeholder="Enter your phone number"
-          />
+          <input type="text" id="phone" name="phone" required placeholder="Enter your phone number" />
         </div>
         <div class="form-group">
           <label for="date">Preferred Date</label>
@@ -60,11 +43,7 @@
         </div>
         <div class="form-group">
           <label for="notes">Special Notes or Symptoms</label>
-          <textarea
-            id="notes"
-            name="notes"
-            placeholder="Enter any special notes or symptoms"
-          ></textarea>
+          <textarea id="notes" name="notes" placeholder="Enter any special notes or symptoms"></textarea>
         </div>
         <button type="submit" class="submit-btn">Submit Appointment</button>
       </form>
@@ -80,21 +59,13 @@
       const form = document.getElementById("appointment-form");
       const confirmation = document.getElementById("confirmation");
 
-      // Get doctor details from URL query parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const doctorId = urlParams.get("doctorId");
-      const doctorName = urlParams.get("doctorName");
-
-      // Set doctor details in the hidden fields
-      document.getElementById("doctorId").value = doctorId;
-      document.getElementById("doctorName").value = doctorName;
-
       form.addEventListener("submit", (event) => {
-        event.preventDefault(); // Prevent form from reloading the page
+        event.preventDefault(); // Prevent page reload
 
         // Gather form data
         const formData = new FormData(form);
         const requestData = {
+          patientId: formData.get("patientId"), 
           doctorId: formData.get("doctorId"),
           doctorName: formData.get("doctorName"),
           name: formData.get("name"),
@@ -105,29 +76,29 @@
           notes: formData.get("notes"),
         };
 
-        console.log("Form Data:", requestData);
+        console.log("Submitting Data:", requestData);
 
-        fetch("booking-form", {
+        fetch("/booking-form", {  // Ensure correct endpoint
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
         })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              form.style.display = "none";
-              confirmation.style.display = "block";
-            } else {
-              console.error("Failed to book appointment:", data.error);
-              alert("Error submitting appointment. Please try again later.");
-            }
-          })
-          .catch((error) => {
-            console.error("Error submitting appointment:", error);
-            alert("An error occurred. Please try again later.");
-          });
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            form.style.display = "none";
+            confirmation.style.display = "block";
+          } else {
+            console.error("Failed to book appointment:", data.error);
+            alert("Error submitting appointment. Please try again.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error submitting appointment:", error);
+          alert("An error occurred. Please try again later.");
+        });
       });
     </script>
   </body>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/view_doctor_appointments.css') }}">
+    <style>
+      /* Navbar Styles */
+      .navbar {
+          width: 100%;
+          background: rgba(255, 255, 255, 0.9);
+          padding: 15px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+      }
+
+      .navbar .brand {
+          font-size: 1.5rem;
+          color: #007bff;
+          font-weight: bold;
+          text-decoration: none;
+          cursor: pointer;
+      }
+
+      .navbar .nav-links {
+          display: flex;
+          gap: 20px;
+          margin-right: 20px;
+      }
+
+      .navbar .nav-links a {
+          text-decoration: none;
+          color: #333;
+          font-size: 1rem;
+          padding: 10px 15px;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+      }
+
+      .navbar .nav-links a:hover {
+          background-color: #007bff;
+          color: #fff;
+      }
+
+      /* Adjust container to prevent overlap with fixed navbar */
+      .container {
+          margin-top: 80px;
+      }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Section -->
+    <div class="navbar">
+        
+      <a href="{{ url_for('load_page', page_name='doctor-user-dashboard') }}" class="brand">CareConnect</a>
+      <div class="nav-links">
+        <a href="{{ url_for('load_page', page_name='doctor-user-dashboard') }}">Home</a>
+        {% if session['token'] %}
+          <a href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="container">
+        <h1>Doctor Portal</h1>
+        <h2>Welcome, Doctor</h2>
+        
+        <h3>Your Appointments</h3>
+        <table id="appointments-table">
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody id="appointments-body">
+                <tr>
+                    <td colspan="6">Loading appointments...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchDoctorAppointments();
+        });
+
+        function fetchDoctorAppointments() {
+            fetch("/view_doctor_appointments", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    populateAppointmentsTable(data.appointments);
+                } else {
+                    alert("Error fetching appointments: " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to load appointments.");
+            });
+        }
+
+        function populateAppointmentsTable(appointments) {
+            const tbody = document.getElementById("appointments-body");
+            tbody.innerHTML = "";  // Clear existing data
+
+            if (appointments.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6'>No appointments found</td></tr>";
+                return;
+            }
+
+            appointments.forEach(appointment => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${appointment.patient_name}</td>
+                    <td>${appointment.patient_email}</td>
+                    <td>${appointment.patient_phone}</td>
+                    <td>${appointment.appointment_date}</td>
+                    <td>${appointment.appointment_time}</td>
+                    <td>${appointment.notes || "N/A"}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function confirmLogout() {
+            return confirm("Are you sure you want to logout?");
+        }
+    </script>
+
+</body>
+</html>
