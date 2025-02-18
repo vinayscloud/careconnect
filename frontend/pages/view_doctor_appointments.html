@@ -60,9 +60,9 @@
     <!-- Navbar Section -->
     <div class="navbar">
         
-      <a href="{{ url_for('load_page', page_name='doctor-user-dashboard') }}" class="brand">CareConnect</a>
+      <a href="{{ url_for('auth.dashboard') }}" class="brand">CareConnect</a>
       <div class="nav-links">
-        <a href="{{ url_for('load_page', page_name='doctor-user-dashboard') }}">Home</a>
+        <a href="{{ url_for('auth.dashboard') }}">Home</a>
         {% if session['token'] %}
           <a href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a>
         {% endif %}
