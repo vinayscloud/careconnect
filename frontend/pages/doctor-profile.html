@@ -14,8 +14,8 @@
     <div class="navbar">
       <div class="brand">CareConnect</div>
       <div class="nav-links">
-        <a href="{{ url_for('auth.dashboard') }}">Home</a>
-        <a href="{{ url_for('auth.dashoboard')}}">Doctors</a>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a>
         <a href="{{ url_for('load_page', page_name='notifications') }}">
           <div class="notifications">
             <span class="icon">🔔</span>
