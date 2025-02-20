@@ -13,7 +13,7 @@ def create_app():
     CORS(app)
 
     # ✅ Register API Blueprints (Routes)
-    app.register_blueprint(doctors_bp)
+    app.register_blueprint(doctors_bp, url_prefix="/api/doctors")
     app.register_blueprint(appointments_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_user_bp)
