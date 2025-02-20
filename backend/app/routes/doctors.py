@@ -9,9 +9,10 @@ doctors_bp = Blueprint("doctors", __name__)
 def get_doctors_portal(current_user):
     """ Renders the doctor portal page """
     if current_user["role"] != "patient":
+    
         return jsonify({"error": "Unauthorized access"}), 403  # Prevent patients from accessing
-
-    return render_template('doctor-profile.html', user=current_user)
+    else:
+        return render_template('doctor-profile.html', user=current_user)
 
 
 
