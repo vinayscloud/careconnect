@@ -1,8 +1,20 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify,render_template
 import mysql.connector
 from app.db_config import get_db_connection
-
+from app.routes.auth import token_required
 doctors_bp = Blueprint("doctors", __name__)
+
+@doctors_bp.route('/get_doctor_portal', methods=['GET'])
+@token_required
+def doctor_portal(current_user):
+    """ Renders the doctor portal page """
+    if current_user["role"] != "patient":
+        return jsonify({"error": "Unauthorized access"}), 403  # Prevent patients from accessing
+
+    return render_template('doctor-profile.html', user=current_user)
+
+
+
 
 @doctors_bp.route("/", methods=["GET"])
 def get_doctors():
