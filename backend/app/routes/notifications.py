@@ -59,12 +59,12 @@ def get_notifications(current_user):
                 if current_user["role"] == "doctor":
                     message = f"You have an appointment with {appointment['name']} {display_date} at {appointment_time}."
                 else:
-                    message = f"Your appointment with Dr. {appointment['name']} is {display_date} at {appointment_time}."
+                    message = f"Your appointment with {appointment['name']} is {display_date} at {appointment_time}."
             else:
                 if current_user["role"] == "doctor":
                     message = f"You have an appointment with {appointment['name']} on {display_date} at {appointment_time}."
                 else:
-                    message = f"Your appointment with Dr. {appointment['name']} is on {display_date} at {appointment_time}."
+                    message = f"Your appointment with {appointment['name']} is on {display_date} at {appointment_time}."
 
             notifications.append({
                 "id": appointment["id"],
