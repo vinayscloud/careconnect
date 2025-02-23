@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const badge = document.querySelector(".badge");
+    const badge = document.querySelector(".notification-badge");  // Red badge on bell icon
     const notificationsList = document.getElementById("notifications-list");
+    const notificationIcon = document.querySelector(".notification-icon");
 
     function fetchNotifications() {
         fetch("/api/notifications", {
@@ -16,13 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.error) {
                 notificationsList.innerHTML = `<li class="no-notifications">${data.error}</li>`;
-                badge.textContent = "0";
+                updateBadgeCount(0);
                 return;
             }
 
             if (data.length === 0) {
                 notificationsList.innerHTML = '<li class="no-notifications">No new notifications.</li>';
-                badge.textContent = "0";
+                updateBadgeCount(0);
                 return;
             }
 
@@ -36,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 notificationsList.appendChild(li);
             });
 
-            badge.textContent = data.length;
+            updateBadgeCount(data.length);
         })
         .catch(error => console.error("❌ DEBUG: Error fetching notifications:", error));
     }
@@ -55,10 +56,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    function updateBadgeCount() {
-        const remainingItems = document.querySelectorAll(".notification-item").length;
-        badge.textContent = remainingItems;
-        if (remainingItems === 0) {
+    function updateBadgeCount(count = null) {
+        if (count === null) {
+            count = document.querySelectorAll(".notification-item").length;
+        }
+
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = "block";  // Show badge
+        } else {
+            badge.style.display = "none";   // Hide badge if no notifications
             notificationsList.innerHTML = '<li class="no-notifications">No new notifications.</li>';
         }
     }

@@ -9,8 +9,14 @@
   <body>
     <div class="navbar">
       <div class="brand">
-        <a class="nav-app-name" href="{{ url_for('index') }}">CareConnect</a>
+          <a class="nav-app-name" href="{{ url_for('index') }}">CareConnect</a>
       </div>
+      <div class="notifications">
+          <span class="notification-icon">🔔</span>
+          <span class="notification-badge" style="display: none;">0</span>
+      </div>
+  </div>
+  
       <!-- <div class="notifications">
         <span class="icon">🔔</span>
         <span class="badge">0</span>

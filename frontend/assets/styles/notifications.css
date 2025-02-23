@@ -38,22 +38,40 @@ body {
   color: #007bff;
 }
 
+/* 🔔 Notification Bell Styling */
 .navbar .notifications {
   position: relative;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.navbar .notifications .badge {
+.notification-icon {
+  font-size: 28px;
+  color: #333;
+  transition: transform 0.2s ease-in-out;
+}
+
+.notification-icon:hover {
+  transform: scale(1.1);
+}
+
+/* 🔴 Red Badge for Notification Count */
+.notification-badge {
   position: absolute;
   top: -5px;
-  right: -5px;
-  background: #ff0000;
-  color: #fff;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 9px;
   border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  display: none;
 }
 
+/* 🔔 Notification Panel */
 .notifications-panel {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
@@ -72,6 +90,7 @@ body {
   color: #333;
 }
 
+/* 📝 Notification Item Styling */
 .notification-item {
   display: flex;
   align-items: center;
@@ -81,6 +100,12 @@ body {
   margin-bottom: 1rem;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.notification-item:hover {
+  background: #e9ecef;
+  transform: scale(1.02);
 }
 
 .notification-item .content {
@@ -88,6 +113,7 @@ body {
   color: #010101;
 }
 
+/* ✅ Mark as Read Button */
 .notification-item .mark-read {
   background: #007bff;
   color: #fff;
@@ -95,15 +121,19 @@ body {
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 .notification-item .mark-read:hover {
   background: #0056b3;
+  transform: scale(1.05);
 }
 
+/* 🚫 No Notifications Message */
 .no-notifications {
   text-align: center;
   font-size: 1.25rem;
   color: #555;
   margin-top: 1rem;
+  font-style: italic;
 }

@@ -11,6 +11,13 @@
         <div class="brand">CareConnect</div>
         <div class="nav-links">
             <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Search Doctors</a>
+            
+            <!-- ✅ Notification Button -->
+            <a href="{{ url_for('load_page', page_name='notifications') }}" class="notifications">
+                <span class="notification-icon">🔔</span>
+                <span class="notification-badge" style="display: none;">0</span>
+            </a>
+
             <a href="{{ url_for('auth.logout') }}" onclick="return confirm('Are you sure you want to logout?')">Logout</a>
         </div>
     </div>
@@ -22,5 +29,9 @@
             <p>Manage your health with easy access to doctors.</p>
         </div>
     </div>
+
+    <!-- ✅ Include Notification Script -->
+    <script src="{{ url_for('static', filename='scripts/notifications.js') }}"></script>
+
 </body>
 </html>
