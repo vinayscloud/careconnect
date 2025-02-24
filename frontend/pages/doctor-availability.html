@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Availability</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    #availability-container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .slot {
+      display: inline-block;
+      width: 100px;
+      height: 50px;
+      margin: 5px;
+      text-align: center;
+      line-height: 50px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .available {
+      background-color: #98fb98; /* Green */
+      color: #fff;
+    }
+    .booked {
+      background-color: #f08080; /* Red */
+      color: #fff;
+      pointer-events: none;
+    }
+    .not-available {
+      background-color: #d3d3d3; /* Gray */
+      color: #fff;
+    }
+    .date-picker {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Doctor Availability</h2>
+<div id="availability-container">
+  <div class="date-picker">
+    <label for="date">Select Date: </label>
+    <input type="date" id="availability-date" />
+  </div>
+  <div id="time-slots"></div>
+  <button onclick="submitAvailability()">Update Availability</button>
+</div>
+
+<script>
+const times = [
+  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+  "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
+  "16:00", "16:30"
+];
+
+function fetchAvailability() {
+  const date = document.getElementById('availability-date').value;
+  if (!date) return;
+
+  fetch(`/doctor-availability/get_availability?date=${date}`)
+    .then(res => res.json())
+    .then(data => {
+      const timeSlotsContainer = document.getElementById('time-slots');
+      timeSlotsContainer.innerHTML = '';
+      times.forEach((time) => {
+        const slot = document.createElement('div');
+        slot.classList.add('slot');
+        slot.textContent = time;
+        slot.dataset.time = time;
+
+        const slotData = data.find(item => item.start_time === time);
+
+        if (slotData) {
+          if (slotData.booked === 'YES') {
+            slot.classList.add('booked');
+          } else if (slotData.status === 'NOT AVAILABLE') {
+            slot.classList.add('not-available');
+          } else {
+            slot.classList.add('available');
+          }
+        } else {
+          slot.classList.add('not-available');
+        }
+
+        slot.onclick = toggleAvailability;
+        timeSlotsContainer.appendChild(slot);
+      });
+    });
+}
+
+function toggleAvailability(event) {
+  const slot = event.target;
+  if (slot.classList.contains('available')) {
+    slot.classList.remove('available');
+    slot.classList.add('not-available');
+  } else if (slot.classList.contains('not-available')) {
+    slot.classList.remove('not-available');
+    slot.classList.add('available');
+  }
+}
+
+function submitAvailability() {
+  const date = document.getElementById('availability-date').value;
+  const slots = document.querySelectorAll('.slot');
+  const availabilityData = Array.from(slots).map(slot => ({
+    time: slot.dataset.time,
+    status: slot.classList.contains('available') ? 'YES' : 'NOT AVAILABLE'
+  }));
+
+  fetch('/doctor-availability/update_availability', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ date, availability: availabilityData })
+  })
+  .then(res => res.json())
+  .then(data => alert(data.message));
+}
+
+document.getElementById('availability-date').addEventListener('change', fetchAvailability);
+</script>
+
+</body>
+</html>
