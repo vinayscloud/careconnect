@@ -2,36 +2,94 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CareConnect</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - CareConnect</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      background: url('{{ url_for("static", filename="images/loginsign.jpg") }}') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .login-container {
+      max-width: 400px;
+      width: 100%;
+      padding: 2rem;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .login-header {
+      font-size: 2rem;
+      color: #007bff;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+
+    .form-floating {
+      margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background-color: #007bff;
+      border: none;
+      padding: 0.75rem;
+      transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .links a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: red;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <h1>Login to CareConnect</h1>
-        <form method="POST" action="{{ url_for('auth.login_page') }}">
-            {% if error %}
-            <div style="color: red; text-align: center; margin-bottom: 1rem;">{{ error }}</div>
-            {% endif %}
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
-            </div>
-            <button type="submit" class="btn">Login</button>
-        </form>
-        <div class="forgot-password">
-            <a href="#">Forgot password?</a>
-        </div>
-        <div class="not-a-member">
-            <p>Not a member? <a href="{{ url_for('auth.signup_page') }}">Sign up</a></p>
-        </div>
+  <div class="login-container">
+    <div class="login-header">Login</div>
+    <form method="POST" action="{{ url_for('auth.login_page') }}">
+      {% if error %}
+      <div class="error-message">{{ error }}</div>
+      {% endif %}
+      <div class="form-floating">
+        <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+        <label for="email">Email Address</label>
+      </div>
+      <div class="form-floating">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+        <label for="password">Password</label>
+      </div>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <div class="links mt-3">
+      <a href="#">Forgot password?</a> | <a href="{{ url_for('auth.signup_page') }}">Sign up</a>
     </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

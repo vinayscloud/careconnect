@@ -1,37 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Patient Portal - CareConnect</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/patient-dashboard.css') }}">
-</head>
-<body>
-    <div class="navbar">
-        <div class="brand">CareConnect</div>
-        <div class="nav-links">
-            <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Search Doctors</a>
-            
-            <!-- ✅ Notification Button -->
-            <a href="{{ url_for('load_page', page_name='notifications') }}" class="notifications">
-                <span class="notification-icon">🔔</span>
-                <span class="notification-badge" style="display: none;">0</span>
-            </a>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+      }
 
-            <a href="{{ url_for('auth.logout') }}" onclick="return confirm('Are you sure you want to logout?')">Logout</a>
+      .navbar {
+        background-color: #007bff;
+        color: #fff;
+      }
+
+      .navbar .nav-link {
+        color: #fff !important;
+      }
+
+      .navbar .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .hero {
+        background: linear-gradient(rgba(0, 123, 255, 0.2), rgba(0, 123, 255, 0.2)),
+          url('{{ url_for("static", filename="images/healthcare-hero.jpg") }}') no-repeat center center;
+        background-size: cover;
+        color: #fff;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .hero-content h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      .hero-content p {
+        font-size: 1.2rem;
+      }
+
+      .card-container {
+        margin-top: 3rem;
+      }
+
+      .card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar Section -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('auth.dashboard') }}">CareConnect</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Search Doctors</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='notifications') }}">Notifications</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirm('Are you sure you want to logout?')">Logout</a></li>
+          </ul>
         </div>
-    </div>
+      </div>
+    </nav>
 
+    <!-- Hero Section -->
     <div class="hero">
-        <img src="{{ url_for('static', filename='images/healthcare-hero.jpg') }}" alt="Healthcare Hero">
-        <div class="hero-content">
-            <h1>Welcome to Your Patient Portal</h1>
-            <p>Manage your health with easy access to doctors.</p>
-        </div>
+      <div class="hero-content">
+        <h1>Welcome to Your Patient Portal</h1>
+        <p>Manage your health with easy access to doctors.</p>
+      </div>
     </div>
 
-    <!-- ✅ Include Notification Script -->
-    <script src="{{ url_for('static', filename='scripts/notifications.js') }}"></script>
+    <!-- Cards Section -->
+    <div class="container card-container">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card text-center p-4">
+            <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+            <h5 class="card-title">Search Doctors</h5>
+            <p class="card-text">Find the best doctors near you and schedule appointments.</p>
+            <a href="{{ url_for('load_page', page_name='doctor-profile') }}" class="btn btn-primary">Start Searching</a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center p-4">
+            <i class="fas fa-bell fa-3x text-primary mb-3"></i>
+            <h5 class="card-title">Notifications</h5>
+            <p class="card-text">Stay updated on upcoming appointments and messages.</p>
+            <a href="{{ url_for('load_page', page_name='notifications') }}" class="btn btn-primary">View Notifications</a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center p-4">
+            <i class="fas fa-file-medical-alt fa-3x text-primary mb-3"></i>
+            <h5 class="card-title">Manage Records</h5>
+            <p class="card-text">Access and manage your medical records and history.</p>
+            <a href="#" class="btn btn-primary">View Records</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-</body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='scripts/notifications.js') }}"></script>
+  </body>
 </html>

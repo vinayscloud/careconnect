@@ -4,210 +4,150 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ontario Health</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f5f5;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        background-color: #f8f9fa;
       }
 
       .navbar {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 1rem 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-      }
-
-      .navbar .brand {
-        font-size: 1.5rem;
-        color: #007bff;
-        font-weight: bold;
-      }
-
-      .navbar .nav-links {
-        display: flex;
-        gap: 2rem;
-      }
-
-      .navbar .nav-links a {
-        text-decoration: none;
-        color: #333;
-        font-size: 1rem;
-        padding: 0.5rem;
-        border-radius: 5px;
-        transition: background-color 0.3s;
-      }
-
-      .navbar .nav-links a:hover {
         background-color: #007bff;
         color: #fff;
       }
 
+      .navbar .nav-link {
+        color: #fff !important;
+        padding: 0.5rem 1rem;
+      }
+
+      .navbar .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
       .hero {
-        width: 100%;
-        max-width: 1200px;
+        background: linear-gradient(rgba(0, 123, 255, 0.2), rgba(0, 123, 255, 0.2)), 
+                    url('{{ url_for("static", filename="images/bg-banner.JPG") }}') no-repeat center center;
+        background-size: cover;
+        color: #fff;
         min-height: 400px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 3rem;
-        background: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
-      .hero img {
-        width: 50%;
-        object-fit: cover;
-      }
-
-      .hero-content {
-        padding: 2rem;
-        display: flex;
-        flex-direction: column;
         justify-content: center;
+        text-align: center;
       }
 
-      .hero-content h1 {
-        font-size: 2.5rem;
-        color: #333;
+      .hero h1 {
+        font-size: 3rem;
         margin-bottom: 1rem;
       }
 
       .hero-content p {
         font-size: 1.2rem;
-        color: #555;
-        margin-bottom: 1.5rem;
       }
 
       .hero-content a {
-        background-color: #007bff;
-        color: #fff;
+        background-color: #fff;
+        color: #007bff;
         padding: 0.75rem 1.5rem;
         font-size: 1rem;
-        text-decoration: none;
         border-radius: 5px;
         transition: background-color 0.3s;
       }
 
       .hero-content a:hover {
         background-color: #0056b3;
+        color: #fff;
       }
 
-      .features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 2rem;
-        width: 100%;
-        max-width: 1200px;
+      .feature-card {
+        transition: transform 0.3s;
       }
 
-      .feature {
-        background: #fff;
-        border-radius: 8px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
-      .feature img {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 1rem;
-      }
-
-      .feature h2 {
-        font-size: 1.5rem;
-        color: #333;
-        margin-bottom: 0.5rem;
-      }
-
-      .feature p {
-        color: #555;
-      }
-
-      @media (max-width: 768px) {
-        .hero {
-          flex-direction: column;
-        }
-
-        .hero img {
-          width: 100%;
-        }
+      .feature-card:hover {
+        transform: translateY(-10px);
       }
     </style>
   </head>
-
   <body>
     <!-- Navbar Section -->
-    <div class="navbar">
-      <div class="brand">CareConnect</div>
-      <div class="nav-links">
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a>
-        <a href="{{ url_for('load_page', page_name='notifications') }}">
-          <div class="notifications">
-            <span class="icon">🔔</span>
-          </div>
-        </a>
-
-        {% if session['token'] %}
-          <a href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a>
-        {% else %}
-          <a href="{{ url_for('load_page', page_name='login') }}">Login</a>
-        {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">CareConnect</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a></li>
+            
+            {% if session['token'] %}
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
+            {% endif %}
+          </ul>
+        </div>
       </div>
-    </div>
+    </nav>
 
     <!-- Hero Section -->
     <div class="hero">
-      <img src="{{ url_for('static', filename='images/bg-banner.JPG') }}" alt="Healthcare Hero" />
       <div class="hero-content">
         <h1>Ontario Health</h1>
-        <p>
-          We support better care for all by connecting and coordinating
-          Ontario's health system.
-        </p>
-        <a href="#">Learn more</a>
+        <p>We support better care for all by connecting and coordinating Ontario's health system.</p>
+        <a href="#" class="btn btn-light">Learn More</a>
       </div>
     </div>
 
     <!-- Features Section -->
-    <div class="features">
-      <div class="feature">
-        <img src="{{ url_for('static', filename='images/coordinated care.jpg') }}" alt="Feature 1" />
-        <h2>Coordinated Care</h2>
-        <p>Ensuring seamless healthcare services for everyone.</p>
-      </div>
-      <div class="feature">
-        <img src="{{ url_for('static', filename='images/support-service.jpeg') }}" alt="Feature 2" />
-        <h2>Support Services</h2>
-        <p>Providing support to enhance the patient experience.</p>
-      </div>
-      <div class="feature">
-        <img src="{{ url_for('static', filename='images/timely-access.jpg') }}" alt="Feature 3" />
-        <h2>Timely Access</h2>
-        <p>Connecting you to care when you need it most.</p>
+    <div class="container my-5">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card feature-card text-center p-3">
+            <img src="{{ url_for('static', filename='images/coordinated care.jpg') }}" alt="Feature 1" class="card-img-top mx-auto" style="width: 50px;">
+            <div class="card-body">
+              <h5 class="card-title">Coordinated Care</h5>
+              <p class="card-text">Ensuring seamless healthcare services for everyone.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card feature-card text-center p-3">
+            <img src="{{ url_for('static', filename='images/support-service.jpeg') }}" alt="Feature 2" class="card-img-top mx-auto" style="width: 50px;">
+            <div class="card-body">
+              <h5 class="card-title">Support Services</h5>
+              <p class="card-text">Providing support to enhance the patient experience.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card feature-card text-center p-3">
+            <img src="{{ url_for('static', filename='images/timely-access.jpg') }}" alt="Feature 3" class="card-img-top mx-auto" style="width: 50px;">
+            <div class="card-body">
+              <h5 class="card-title">Timely Access</h5>
+              <p class="card-text">Connecting you to care when you need it most.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Logout confirmation function
       function confirmLogout() {
-          return confirm("Are you sure you want to logout?");
+        return confirm("Are you sure you want to logout?");
       }
     </script>
   </body>

@@ -6,95 +6,132 @@
     <title>Doctor Profile</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles/doctor-profile.css') }}"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .navbar {
+        background-color: #007bff;
+        color: #fff;
+      }
+
+      .navbar .nav-link {
+        color: #fff !important;
+        padding: 0.5rem 1rem;
+      }
+
+      .navbar .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .card-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .card-hover:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+    </style>
   </head>
   <body>
     <!-- Navbar Section -->
-    <div class="navbar">
-      <a href="{{ url_for('auth.dashboard') }}" class="brand">CareConnect</a>
-      <div class="nav-links">
-        <a href="{{ url_for('auth.dashboard') }}">Home</a>
-        <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a>
-        <a href="{{ url_for('load_page', page_name='notifications') }}">
-          <div class="notifications">
-            <span class="icon">🔔</span>
-          </div>
-        </a>
-
-        {% if session['token'] %}
-          <a href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a>
-        {% else %}
-          <a href="{{ url_for('load_page', page_name='login') }}">Login</a>
-        {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('auth.dashboard') }}">CareConnect</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.dashboard') }}">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a></li>
+            
+            
+            {% if session['token'] %}
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
+            {% endif %}
+          </ul>
+        </div>
       </div>
-    </div>
+    </nav>
 
     <!-- Search and Filter Section -->
-    <div class="search-container">
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search by name..." />
-
-        <select id="specialtyFilter" class="filter-dropdown">
-          <option value="">All Specialties</option>
-          <option value="Cardiologist">Cardiologist</option>
-          <option value="Dermatologist">Dermatologist</option>
-          <option value="Neurologist">Neurologist</option>
-          <option value="Pediatrician">Pediatrician</option>
-        </select>
-
-        <select id="cityFilter" class="filter-dropdown">
-          <option value="">All Cities</option>
-          <option value="New York">New York</option>
-          <option value="Los Angeles">Los Angeles</option>
-          <option value="Chicago">Chicago</option>
-        </select>
-
-        <input
-          type="number"
-          id="experienceFilter"
-          class="filter-dropdown"
-          placeholder="Min Experience (years)"
-          min="0"
-        />
-
-        <input
-          type="number"
-          id="ratingFilter"
-          class="filter-dropdown"
-          placeholder="Min Rating (1-5)"
-          min="1"
-          max="5"
-          step="0.1"
-        />
-
-        <button id="searchButton">Search</button>
+    <div class="container my-4">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+        </div>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search doctors by name, specialty, or location..." />
+        <div class="input-group-append">
+          <button id="clearButton" class="btn btn-secondary" type="button"><i class="fas fa-times"></i></button>
+          <button id="searchButton" class="btn btn-primary" type="button">Search</button>
+        </div>
       </div>
 
-      <div class="loading" id="loading" style="display: none">
-        Loading results...
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <select id="specialtyFilter" class="form-control">
+            <option value="">All Specialties</option>
+            <option value="Cardiologist">Cardiologist</option>
+            <option value="Dermatologist">Dermatologist</option>
+            <option value="Neurologist">Neurologist</option>
+            <option value="Pediatrician">Pediatrician</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <select id="cityFilter" class="form-control">
+            <option value="">All Cities</option>
+            <option value="New York">New York</option>
+            <option value="Los Angeles">Los Angeles</option>
+            <option value="Chicago">Chicago</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <input type="number" id="experienceFilter" class="form-control" placeholder="Min Experience (years)" min="0" />
+        </div>
+        <div class="col-md-3 mb-3">
+          <input type="number" id="ratingFilter" class="form-control" placeholder="Min Rating (1-5)" min="1" max="5" step="0.1" />
+        </div>
       </div>
-      <div class="results" id="results"></div>
     </div>
 
     <!-- Doctor Profiles Section -->
-    <div class="doctor-profiles-container" id="doctorProfiles"></div>
+    <div class="container" id="doctorProfiles"></div>
 
     <script>
-      // Logout confirmation function
       function confirmLogout() {
-          return confirm("Are you sure you want to logout?");
+        return confirm("Are you sure you want to logout?");
       }
 
-      // Fetch doctors from API with filters
-      async function fetchDoctors() {
-        document.getElementById("loading").style.display = "block";
+      document.getElementById('clearButton').addEventListener('click', () => {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('specialtyFilter').value = '';
+        document.getElementById('cityFilter').value = '';
+        document.getElementById('experienceFilter').value = '';
+        document.getElementById('ratingFilter').value = '';
+        fetchDoctors(); 
+      });
 
-        const searchQuery = document.getElementById("searchInput").value.toLowerCase();
-        const specialty = document.getElementById("specialtyFilter").value;
-        const city = document.getElementById("cityFilter").value;
-        const minExperience = document.getElementById("experienceFilter").value;
-        const minRating = document.getElementById("ratingFilter").value;
+      async function fetchDoctors() {
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+        const specialty = document.getElementById('specialtyFilter').value;
+        const city = document.getElementById('cityFilter').value;
+        const minExperience = document.getElementById('experienceFilter').value;
+        const minRating = document.getElementById('ratingFilter').value;
 
         let queryParams = `?search=${searchQuery}`;
         if (specialty) queryParams += `&specialty=${specialty}`;
@@ -104,37 +141,45 @@
 
         const response = await fetch(`/api/doctors${queryParams}`);
         const doctors = await response.json();
-
-        document.getElementById("loading").style.display = "none";
         renderDoctors(doctors);
       }
 
       function renderDoctors(doctors) {
-        const profilesContainer = document.getElementById("doctorProfiles");
-        profilesContainer.innerHTML = doctors.length ? "" : "<p>No doctors found.</p>";
-        doctors.forEach((doctor) => {
-          const doctorCard = document.createElement("div");
-          doctorCard.className = "doctor-profile";
+        const profilesContainer = document.getElementById('doctorProfiles');
+        profilesContainer.innerHTML = doctors.length ? '' : '<p>No doctors found.</p>';
+
+        let row = null;
+
+        doctors.forEach((doctor, index) => {
+          if (index % 4 === 0) {
+            row = document.createElement('div');
+            row.className = 'row mb-4';
+            profilesContainer.appendChild(row);
+          }
+
+          const doctorCard = document.createElement('div');
+          doctorCard.className = 'col-md-3 mb-4';
           doctorCard.innerHTML = `
-            <div class="doctor-photo">
-                <img src="${doctor.image}" alt="${doctor.name}">
-            </div>
-            <div class="doctor-details">
-                <h1>${doctor.name}</h1>
-                <p><strong>Specialty:</strong> ${doctor.specialty}</p>
-                <p><strong>Location:</strong> ${doctor.location}</p>
-                <p><strong>Experience:</strong> ${doctor.experience} years</p>
-                <div class="rating">★ ${doctor.rating}/5</div>
-                <a href="/booking-form?doctorId=${doctor.id}" class="book-appointment">Book Appointment</a>
+            <div class="card h-100 card-hover">
+              <img src="${doctor.image}" class="card-img-top" alt="${doctor.name}">
+              <div class="card-body">
+                <h5 class="card-title">${doctor.name}</h5>
+                <p class="card-text"><strong>Specialty:</strong> ${doctor.specialty}</p>
+                <p class="card-text"><strong>Location:</strong> ${doctor.location}</p>
+                <p class="card-text"><strong>Experience:</strong> ${doctor.experience} years</p>
+                <p class="card-text"><strong>Rating:</strong> ★ ${doctor.rating}/5</p>
+                <a href="/booking-form?doctorId=${doctor.id}" class="btn btn-primary">Book Appointment</a>
+              </div>
             </div>
           `;
-          profilesContainer.appendChild(doctorCard);
+          row.appendChild(doctorCard);
         });
       }
 
-      document.getElementById("searchButton").addEventListener("click", fetchDoctors);
-
+      document.getElementById('searchButton').addEventListener('click', fetchDoctors);
       fetchDoctors();
     </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
