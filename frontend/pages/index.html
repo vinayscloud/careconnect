@@ -1,154 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ontario Health</title>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <style>
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f8f9fa;
-      }
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
 
-      .navbar {
-        background-color: #007bff;
-        color: #fff;
-      }
+        .navbar {
+            background-color: #007bff;
+            color: #fff;
+        }
 
-      .navbar .nav-link {
-        color: #fff !important;
-        padding: 0.5rem 1rem;
-      }
+        .navbar .nav-link {
+            color: #fff !important;
+            padding: 0.5rem 1rem;
+        }
 
-      .navbar .navbar-brand {
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
+        .navbar .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
 
-      .hero {
-        background: linear-gradient(rgba(0, 123, 255, 0.2), rgba(0, 123, 255, 0.2)), 
-                    url('{{ url_for("static", filename="images/bg-banner.JPG") }}') no-repeat center center;
-        background-size: cover;
-        color: #fff;
-        min-height: 400px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-      }
+        .hero {
+            background: linear-gradient(rgba(0, 123, 255, 0.2), rgba(0, 123, 255, 0.2)), 
+                        url('{{ url_for("static", filename="images/family-doctor.JPG") }}') no-repeat center center;
+            background-size: cover;
+            color: #fff;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
 
-      .hero h1 {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-      }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
 
-      .hero-content p {
-        font-size: 1.2rem;
-      }
+        .hero-content p {
+            font-size: 1.2rem;
+        }
 
-      .hero-content a {
-        background-color: #fff;
-        color: #007bff;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        border-radius: 5px;
-        transition: background-color 0.3s;
-      }
+        .hero-content a {
+            background-color: #fff;
+            color: #007bff;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
 
-      .hero-content a:hover {
-        background-color: #0056b3;
-        color: #fff;
-      }
+        .hero-content a:hover {
+            background-color: #0056b3;
+            color: #fff;
+        }
 
-      .feature-card {
-        transition: transform 0.3s;
-      }
+        .feature-card {
+            transition: transform 0.3s;
+        }
 
-      .feature-card:hover {
-        transform: translateY(-10px);
-      }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* Testimonials */
+        .testimonial {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .testimonial-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            border: 3px solid #007bff;
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            color: #555;
+            font-style: italic;
+        }
+
+        .stars {
+            font-size: 1.3rem;
+            color: gold;
+            margin-top: 10px;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
+
     <!-- Navbar Section -->
     <nav class="navbar navbar-expand-lg navbar-dark">
-      <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">CareConnect</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ml-auto">
-            
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a></li>
-            
-            {% if session['token'] %}
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
-            {% else %}
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
-            {% endif %}
-          </ul>
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">CareConnect</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a></li>
+                    {% if session['token'] %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
 
     <!-- Hero Section -->
     <div class="hero">
-      <div class="hero-content">
-        <h1>Ontario Health</h1>
-        <p>We support better care for all by connecting and coordinating Ontario's health system.</p>
-        <a href="#" class="btn btn-light">Learn More</a>
-      </div>
+        <div class="hero-content">
+            <h1>Ontario Health</h1>
+            <p>We support better care for all by connecting and coordinating Ontario's health system.</p>
+            <a href="{{ url_for('load_page', page_name='learn-more') }}" class="btn btn-light">Learn More</a>
+        </div>
     </div>
 
     <!-- Features Section -->
     <div class="container my-5">
-      <div class="row">
-        <div class="col-md-4">
-          <div class="card feature-card text-center p-3">
-            <img src="{{ url_for('static', filename='images/coordinated care.jpg') }}" alt="Feature 1" class="card-img-top mx-auto" style="width: 50px;">
-            <div class="card-body">
-              <h5 class="card-title">Coordinated Care</h5>
-              <p class="card-text">Ensuring seamless healthcare services for everyone.</p>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card feature-card text-center p-3">
+                    <img src="{{ url_for('static', filename='images/coordinated-care.jpg') }}" alt="Coordinated Care" class="card-img-top mx-auto" style="width: 100px;">
+                    <div class="card-body">
+                        <h5 class="card-title">Coordinated Care</h5>
+                        <p class="card-text">Ensuring seamless healthcare services for everyone.</p>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card feature-card text-center p-3">
-            <img src="{{ url_for('static', filename='images/support-service.jpeg') }}" alt="Feature 2" class="card-img-top mx-auto" style="width: 50px;">
-            <div class="card-body">
-              <h5 class="card-title">Support Services</h5>
-              <p class="card-text">Providing support to enhance the patient experience.</p>
+            <div class="col-md-4">
+                <div class="card feature-card text-center p-3">
+                    <img src="{{ url_for('static', filename='images/support-service.jpeg') }}" alt="Support Services" class="card-img-top mx-auto" style="width: 100px;">
+                    <div class="card-body">
+                        <h5 class="card-title">Support Services</h5>
+                        <p class="card-text">Providing support to enhance the patient experience.</p>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card feature-card text-center p-3">
-            <img src="{{ url_for('static', filename='images/timely-access.jpg') }}" alt="Feature 3" class="card-img-top mx-auto" style="width: 50px;">
-            <div class="card-body">
-              <h5 class="card-title">Timely Access</h5>
-              <p class="card-text">Connecting you to care when you need it most.</p>
+            <div class="col-md-4">
+                <div class="card feature-card text-center p-3">
+                    <img src="{{ url_for('static', filename='images/timely-access.jpg') }}" alt="Timely Access" class="card-img-top mx-auto" style="width: 100px;">
+                    <div class="card-body">
+                        <h5 class="card-title">Timely Access</h5>
+                        <p class="card-text">Connecting you to care when you need it most.</p>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      function confirmLogout() {
-        return confirm("Are you sure you want to logout?");
-      }
-    </script>
-  </body>
+    <!-- Testimonials Section -->
+    <section class="container my-5">
+        <h2 class="text-center text-primary mb-4">What Our Users Say</h2>
+        <div id="testimonialCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="testimonial">
+                        <img src="{{ url_for('static', filename='images/user1.png') }}" alt="User 1" class="testimonial-img">
+                        <h4>Sarah Thompson</h4>
+                        <p class="testimonial-text">"CareConnect has made booking doctor appointments so easy!"</p>
+                        <div class="stars">⭐⭐⭐⭐⭐</div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="testimonial">
+                        <img src="{{ url_for('static', filename='images/user2.jpg') }}" alt="User 2" class="testimonial-img">
+                        <h4>Michael Lee</h4>
+                        <p class="testimonial-text">"The notification system is a lifesaver!"</p>
+                        <div class="stars">⭐⭐⭐⭐⭐</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Controls (Next & Previous Buttons) -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white text-center py-4">
+        <div class="container">
+            <p>&copy; 2024 CareConnect. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

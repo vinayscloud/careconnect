@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn More - CareConnect</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/learn-more.css') }}">
+</head>
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+  }
+
+  .navbar {
+    background-color: #007bff;
+    color: #fff;
+  }
+
+  .navbar .nav-link {
+    color: #fff !important;
+    padding: 0.5rem 1rem;
+  }
+
+  .navbar .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .hero {
+    background: linear-gradient(rgba(0, 123, 255, 0.2), rgba(0, 123, 255, 0.2)), 
+                url('{{ url_for("static", filename="images/family-doctor.jpg") }}') no-repeat center center;
+    background-size: cover;
+    color: #fff;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-content p {
+    font-size: 1.2rem;
+  }
+
+  .hero-content a {
+    background-color: #fff;
+    color: #007bff;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+
+  .hero-content a:hover {
+    background-color: #0056b3;
+    color: #fff;
+  }
+
+  .feature-card {
+    transition: transform 0.3s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+  }
+</style>
+</head>
+<body>
+<!-- Navbar Section -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">CareConnect</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a></li>
+        
+        {% if session['token'] %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<body>
+  <!-- Hero Section -->
+  <section class="hero-section text-white text-center">
+    <div class="container">
+      <h1 class="display-4">About Us</h1>
+      <p class="lead">Connecting, Coordinating, and Modernizing Ontario’s Health Care System.</p>
+    </div>
+  </section>
+
+  <!-- About Us -->
+  <section class="container about-us my-5">
+    <div class="row">
+      <div class="col-md-6">
+        <img src="{{ url_for('static', filename='images/learnmore.jpg') }}" alt="Multicultural Team" class="img-fluid rounded shadow">
+      </div>
+      <div class="col-md-6">
+        <h2>Who We Are</h2>
+        <p>We are an agency created by the Government of Ontario to connect, coordinate and modernize our province’s health care system. We work with partners, providers, and patients to make the health system more efficient so everyone in Ontario has an opportunity for better health and wellbeing.</p>
+        <p>We oversee health care planning and delivery across the province to build a **person-centered** health care system.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Work -->
+  <section class="container my-5">
+    <h2 class="text-center">Our Work</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <ul class="list-group">
+          <li class="list-group-item">✔ Measuring and reporting on health system performance</li>
+          <li class="list-group-item">✔ Overseeing quality of clinical care services</li>
+          <li class="list-group-item">✔ Managing funding and accountability</li>
+          <li class="list-group-item">✔ Delivering organ and tissue donation services</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul class="list-group">
+          <li class="list-group-item">✔ Creating provincial digital and virtual health services</li>
+          <li class="list-group-item">✔ Setting quality standards for clinical care</li>
+          <li class="list-group-item">✔ Supporting Ontario’s COVID-19 response</li>
+          <li class="list-group-item">✔ Quick Services and Health Benefits</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Equity & Health -->
+  <section class="container text-center my-5">
+    <h2>Guiding Our Work</h2>
+    <p>We are committed to **equity, inclusion, diversity, and anti-racism** to create a **better health care experience** for all communities.</p>
+  </section>
+
+  <!-- Our Values -->
+  <section class="container my-5">
+    <h2 class="text-center">Our Vision, Mission & Values</h2>
+    <div class="row text-center">
+      <div class="col-md-4">
+        <h4>🌟 Vision</h4>
+        <p>Together, we will be a leader in health and wellness for all.</p>
+      </div>
+      <div class="col-md-4">
+        <h4>🚀 Mission</h4>
+        <p>To connect the health system to drive improved and equitable health outcomes, experiences, and value.</p>
+      </div>
+      <div class="col-md-4">
+        <h4>💙 Values</h4>
+        <p>Integrity, Inspiration, Tenacity, Humility, Care, Equity.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer bg-dark text-white text-center py-4">
+    <div class="container">
+      <p>&copy; 2024 CareConnect. All Rights Reserved.</p>
+      <a href="#" class="text-white mx-2">Accessibility</a> |
+      <a href="#" class="text-white mx-2">Careers</a> |
+      <a href="#" class="text-white mx-2">Privacy</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

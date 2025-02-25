@@ -1,105 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Book Appointment</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/booking-form.css') }}">
-  </head>
-  <body>
-    <div class="appointment-form">
-      <h1>Book an Appointment</h1>
-      <form id="appointment-form">
-        <!-- Hidden Fields for Doctor & Patient Details -->
-        <input type="hidden" id="doctorId" name="doctorId" value="{{ doctor.id }}" />
-        <input type="hidden" id="doctorName" name="doctorName" value="{{ doctor.name }}" />
-        <input type="hidden" id="patientId" name="patientId" value="{{ patient_id }}" />
 
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" required placeholder="Enter your full name" />
-        </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" required placeholder="Enter your email address" />
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input type="text" id="phone" name="phone" required placeholder="Enter your phone number" />
-        </div>
-        <div class="form-group">
-          <label for="date">Preferred Date</label>
-          <input type="date" id="date" name="date" required />
-        </div>
-        <div class="form-group">
-          <label for="time">Preferred Time</label>
-          <select id="time" name="time" required>
-            <option value="9:00 AM">9:00 AM</option>
-            <option value="10:00 AM">10:00 AM</option>
-            <option value="11:00 AM">11:00 AM</option>
-            <option value="2:00 PM">2:00 PM</option>
-            <option value="3:00 PM">3:00 PM</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="notes">Special Notes or Symptoms</label>
-          <textarea id="notes" name="notes" placeholder="Enter any special notes or symptoms"></textarea>
-        </div>
-        <button type="submit" class="submit-btn">Submit Appointment</button>
-      </form>
-      <div class="confirmation" id="confirmation" style="display: none">
-        <p>Your appointment has been successfully booked!</p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment - CareConnect</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      background: url('{{ url_for("static", filename="images/hospital-background.jpg") }}') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .appointment-form {
+      max-width: 700px;
+      margin: 2rem auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: #007bff;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-floating {
+      margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background-color: #007bff;
+      border: none;
+      padding: 0.75rem;
+      transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .back-btn a {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .back-btn a:hover {
+      text-decoration: underline;
+    }
+
+    .confirmation {
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="appointment-form">
+    <h1>Doctor Appointment Request Form</h1>
+    <form id="appointment-form">
+      <input type="hidden" id="doctorId" name="doctorId" value="{{ doctor.id }}">
+      <input type="hidden" id="doctorName" name="doctorName" value="{{ doctor.name }}">
+      <input type="hidden" id="patientId" name="patientId" value="{{ patient_id }}">
+
+      <div class="form-floating">
+        <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+        <label for="name">Full Name</label>
       </div>
-      <div class="back-btn">
-        <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Back to Doctor Profile</a>
+      <div class="form-floating">
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required>
+        <label for="email">Email Address</label>
       </div>
+      <div class="form-floating">
+        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
+        <label for="phone">Phone Number</label>
+      </div>
+      <div class="form-floating mb-3">
+        <select id="gender" name="gender" class="form-select">
+          <option value="" selected>Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+        <label for="gender">Gender</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="date" class="form-control" id="date" name="date" required>
+        <label for="date">Preferred Date</label>
+      </div>
+      <div class="form-floating mb-3">
+        <select id="time" name="time" class="form-select" required>
+          <option value="" selected>Select Time</option>
+          <option value="9:00 AM">9:00 AM</option>
+          <option value="10:00 AM">10:00 AM</option>
+          <option value="11:00 AM">11:00 AM</option>
+          <option value="2:00 PM">2:00 PM</option>
+          <option value="3:00 PM">3:00 PM</option>
+        </select>
+        <label for="time">Preferred Time</label>
+      </div>
+      <div class="form-floating">
+        <textarea class="form-control" id="notes" name="notes" placeholder="Enter any special notes or symptoms"></textarea>
+        <label for="notes">Special Notes or Symptoms</label>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit Appointment</button>
+    </form>
+    <div class="confirmation" id="confirmation" style="display: none">
+      Your appointment has been successfully booked!
     </div>
+    <div class="back-btn">
+      <a href="{{ url_for('load_page', page_name='doctor-profile') }}">Back to Doctor Profile</a>
+    </div>
+  </div>
 
-    <script>
-      const form = document.getElementById("appointment-form");
-      const confirmation = document.getElementById("confirmation");
+  <script>
+    const form = document.getElementById("appointment-form");
+    const confirmation = document.getElementById("confirmation");
 
-      form.addEventListener("submit", (event) => {
-        event.preventDefault(); // Prevent page reload
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
 
-        // Gather form data
-        const formData = new FormData(form);
-        const requestData = {
-          patientId: formData.get("patientId"), 
-          doctorId: formData.get("doctorId"),
-          doctorName: formData.get("doctorName"),
-          name: formData.get("name"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          date: formData.get("date"),
-          time: formData.get("time"),
-          notes: formData.get("notes"),
-        };
+      const formData = new FormData(form);
+      const requestData = {
+        patientId: formData.get("patientId"),
+        doctorId: formData.get("doctorId"),
+        doctorName: formData.get("doctorName"),
+        name: formData.get("name"),
+        email: formData.get("email"),
+        phone: formData.get("phone"),
+        date: formData.get("date"),
+        time: formData.get("time"),
+        notes: formData.get("notes"),
+        gender: formData.get("gender")
+      };
 
-        console.log("Submitting Data:", requestData);
-
-        fetch("/booking-form", {  // Ensure correct endpoint
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            form.style.display = "none";
-            confirmation.style.display = "block";
-          } else {
-            console.error("Failed to book appointment:", data.error);
-            alert("Error submitting appointment. Please try again.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error submitting appointment:", error);
-          alert("An error occurred. Please try again later.");
-        });
+      fetch("/booking-form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          form.style.display = "none";
+          confirmation.style.display = "block";
+        } else {
+          alert("Error submitting appointment. Please try again.");
+        }
+      })
+      .catch(error => {
+        console.error("Error submitting appointment:", error);
+        alert("An error occurred. Please try again later.");
       });
-    </script>
-  </body>
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
 </html>
