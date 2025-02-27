@@ -161,7 +161,7 @@
           doctorCard.className = 'col-md-3 mb-4';
           doctorCard.innerHTML = `
             <div class="card h-100 card-hover">
-              <img src="${doctor.image}" class="card-img-top" alt="${doctor.name}">
+              <img src= "{{ url_for('static', filename='images/doc4.jpg') }}" class="card-img-top" alt="${doctor.name}">
               <div class="card-body">
                 <h5 class="card-title">${doctor.name}</h5>
                 <p class="card-text"><strong>Specialty:</strong> ${doctor.specialty}</p>
