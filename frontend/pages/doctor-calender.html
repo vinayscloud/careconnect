@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Availability Calendar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        #calendar {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+        .available-slot {
+            background-color: #28a745 !important; /* Green for available */
+        }
+        .booked-slot {
+            background-color: #dc3545 !important; /* Red for booked */
+        }
+    </style>
+</head>
+<body>
+
+    <h2 style="text-align:center;">Doctor Availability Calendar</h2>
+    <div id="calendar"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    $.ajax({
+                        url: '/get_availability',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { date: fetchInfo.startStr },  // Fetching based on visible calendar range
+                        success: function(data) {
+                            let events = [];
+                            data.forEach(slot => {
+                                events.push({
+                                    title: slot.is_available === 'Y' ? 'Available' : 'Unavailable',
+                                    start: slot.availability_date + 'T' + slot.start_time,
+                                    end: slot.availability_date + 'T' + slot.end_time,
+                                    className: slot.is_available === 'Y' ? 'available-slot' : 'booked-slot'
+                                });
+                            });
+                            successCallback(events);
+                        },
+                        error: function() {
+                            failureCallback();
+                        }
+                    });
+                }
+            });
+            calendar.render();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template
-import mysql.connector
-from datetime import datetime, timedelta
 from app.db_config import get_db_connection
 from app.routes.auth import token_required
+from datetime import datetime, timedelta
 
 doctor_availability_bp = Blueprint('doctor_availability', __name__)
 
@@ -26,10 +25,10 @@ def get_availability(current_user):
         cursor.execute('''
             SELECT TIME_FORMAT(start_time, '%H:%i') AS start_time, 
                    TIME_FORMAT(end_time, '%H:%i') AS end_time,
-                   status, 
-                   booked
+                   is_available, 
+                   is_booked
             FROM doctor_availability
-            WHERE id = %s AND availability_date = %s
+            WHERE doctor_id = %s AND availability_date = %s
         ''', (doctor_id, date))
         
         availability_slots = cursor.fetchall()
@@ -70,28 +69,28 @@ def update_availability(current_user):
             start_time = datetime.strptime(time, '%H:%M').strftime('%H:%M:00')
             end_time = (datetime.strptime(start_time, '%H:%M:%S') + timedelta(minutes=30)).strftime('%H:%M:00')
 
-            if status == 'NOT AVAILABLE':
+            if status == 'N':
                 # Update the slot to set status and booked = 'NO'
                 cursor.execute('''
                     UPDATE doctor_availability
-                    SET status = 'NOT AVAILABLE', booked = 'NO'
-                    WHERE id = %s AND availability_date = %s AND start_time = %s AND end_time = %s
+                    SET is_available = 'N', is_booked = 'N'
+                    WHERE doctor_id = %s AND availability_date = %s AND start_time = %s AND end_time = %s
                 ''', (doctor_id, date, start_time, end_time))
-            elif status == 'AVAILABLE':
+            elif status == 'A':
                 # Update the slot to set status to AVAILABLE without affecting booked
                 cursor.execute('''
                     UPDATE doctor_availability
-                    SET status = 'AVAILABLE'
-                    WHERE id = %s AND availability_date = %s AND start_time = %s AND end_time = %s
+                    SET is_available = 'Y'
+                    WHERE doctor_id = %s AND availability_date = %s AND start_time = %s AND end_time = %s
                 ''', (doctor_id, date, start_time, end_time))
 
             # Insert the slot if it doesn't exist
             cursor.execute('''
-                INSERT INTO doctor_availability (id, availability_date, start_time, end_time, booked, status)
-                SELECT %s, %s, %s, %s, 'NO', %s
+                INSERT INTO doctor_availability (doctor_id, availability_date, start_time, end_time, is_booked, is_available)
+                SELECT %s, %s, %s, %s, 'N', %s
                 WHERE NOT EXISTS (
                     SELECT 1 FROM doctor_availability
-                    WHERE id = %s AND availability_date = %s AND start_time = %s AND end_time = %s
+                    WHERE doctor_id = %s AND availability_date = %s AND start_time = %s AND end_time = %s
                 )
             ''', (doctor_id, date, start_time, end_time, status, doctor_id, date, start_time, end_time))
 
@@ -113,3 +112,4 @@ def doctor_availability_page(current_user):
         return jsonify({"error": "Unauthorized access"}), 403
 
     return render_template('doctor-availability.html')
+

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,9 +99,9 @@ function fetchAvailability() {
         const slotData = data.find(item => item.start_time === time);
 
         if (slotData) {
-          if (slotData.booked === 'YES') {
+          if (slotData.is_booked === 'Y') {
             slot.classList.add('booked');
-          } else if (slotData.status === 'NOT AVAILABLE') {
+          } else if (slotData.is_available === 'N') {
             slot.classList.add('not-available');
           } else {
             slot.classList.add('available');
@@ -131,7 +132,7 @@ function submitAvailability() {
   const slots = document.querySelectorAll('.slot');
   const availabilityData = Array.from(slots).map(slot => ({
     time: slot.dataset.time,
-    status: slot.classList.contains('available') ? 'YES' : 'NOT AVAILABLE'
+    status: slot.classList.contains('available') ? 'Y' : 'N'
   }));
 
   fetch('/doctor-availability/update_availability', {
