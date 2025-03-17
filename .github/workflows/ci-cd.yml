@@ -3,7 +3,7 @@ name: Deploy to AWS ECS
 on:
   push:
     branches:
-      - final  # Triggers deployment when code is pushed to the main branch
+      - final-mservices  # Triggers deployment when code is pushed to the 'final' branch
 
 jobs:
   build-and-deploy:
@@ -24,16 +24,27 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and Tag Docker Image
+      # ✅ Build and Push Monolithic App (Auth + Frontend)
+      - name: Build and Push Monolithic App
         run: |
           ECR_REPO_URI=548895127859.dkr.ecr.us-east-1.amazonaws.com/flask-app
-          docker build -t $ECR_REPO_URI:latest .
+          docker build -t $ECR_REPO_URI:monolithic-latest  . 
+          docker push $ECR_REPO_URI:monolithic-latest
           echo "ECR_REPO_URI=$ECR_REPO_URI" >> $GITHUB_ENV
 
-      - name: Push Docker Image to Amazon ECR
+      # ✅ Build and Push Doctor Search Microservice with a different tag
+      - name: Build and Push Doctor Search Microservice
         run: |
-          docker push ${{ env.ECR_REPO_URI }}:latest
+          ECR_REPO_URI=548895127859.dkr.ecr.us-east-1.amazonaws.com/flask-app
+          docker build -t $ECR_REPO_URI:doctor-search-latest ./services/doctors_search_service  
+          docker push $ECR_REPO_URI:doctor-search-latest
 
-      - name: Deploy New Image to ECS
+      # ✅ Deploy Monolithic App (Auth + Frontend) to ECS
+      - name: Deploy Monolithic App to ECS
         run: |
-          aws ecs update-service --cluster flask-cluster --service flask-service --force-new-deployment
+          aws ecs update-service --cluster flask-cluster --service flask-frontend --force-new-deployment
+
+      # ✅ Deploy Doctor Search Microservice to ECS
+      - name: Deploy Doctor Search Microservice to ECS
+        run: |
+          aws ecs update-service --cluster flask-cluster --service flask-doctorsearch --force-new-deployment
