@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from flask_cors import CORS
-from app.routes.doctors import doctors_bp
 from app.routes.appointments import appointments_bp
 from app.routes.auth import auth_bp
 from app.routes.admin_user import admin_user_bp
@@ -16,7 +15,6 @@ def create_app():
     CORS(app)
 
     # ✅ Register API Blueprints (Routes)
-    app.register_blueprint(doctors_bp, url_prefix="/api/doctors")
     app.register_blueprint(appointments_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_user_bp)

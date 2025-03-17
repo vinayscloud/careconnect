@@ -138,8 +138,7 @@
         if (city) queryParams += `&city=${city}`;
         if (minExperience) queryParams += `&min_experience=${minExperience}`;
         if (minRating) queryParams += `&min_rating=${minRating}`;
-
-        const response = await fetch(`/api/doctors${queryParams}`);
+        const response = await fetch("http://127.0.0.1:5001/api/doctors" + queryParams);
         const doctors = await response.json();
         renderDoctors(doctors);
       }
