@@ -4,6 +4,9 @@ from db_config import get_db_connection
 
 doctors_bp = Blueprint("doctors", __name__)
 
+
+
+
 @doctors_bp.route("/", methods=["GET"])
 def get_doctors():
     filters = {
