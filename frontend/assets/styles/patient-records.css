@@ -1,0 +1,16 @@
+body {
+    background-color: #f8f9fa;
+}
+
+h2 {
+    color: #28a745;
+}
+
+.table {
+    background-color: #ffffff;
+}
+
+textarea {
+    width: 100%;
+    height: 60px;
+}

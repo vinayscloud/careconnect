@@ -7,6 +7,8 @@ from app.routes.admin_user import admin_user_bp
 from app.routes.view_doctor_appointments import doctor_view_appointments_bp
 from app.routes.notifications import notifications_bp
 from app.routes.doctor_availability import doctor_availability_bp
+from app.routes.doctor_patient_records import doctor_patient_records_bp
+
 
 def create_app():
     """Create and configure the Flask app."""
@@ -23,6 +25,7 @@ def create_app():
     app.register_blueprint(doctor_view_appointments_bp)
     app.register_blueprint(notifications_bp, url_prefix="/api")
     app.register_blueprint(doctor_availability_bp, url_prefix="/doctor-availability")
+    app.register_blueprint(doctor_patient_records_bp, url_prefix="/records")
 
     # ✅ Serve Frontend Pages
     @app.route('/')

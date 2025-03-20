@@ -53,10 +53,10 @@ def booking_form(current_user):
             if not all([doctor_id, patient_id, doctor_name, patient_name, patient_email, appointment_date, appointment_time]):
                 return jsonify({"error": "Missing required fields"}), 400
 
-            # Insert appointment details into the database
             conn = get_db_connection()
             cursor = conn.cursor()
 
+            # Insert appointment details into the database
             insert_query = """
                 INSERT INTO appointments (patient_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone, 
                                           appointment_date, appointment_time, notes)
@@ -64,6 +64,15 @@ def booking_form(current_user):
             """
             cursor.execute(insert_query, (patient_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone, 
                                           appointment_date, appointment_time, notes))
+
+            appointment_id = cursor.lastrowid  # Get the last inserted appointment ID
+
+            # ✅ Insert into `patient_doctor_records`
+            insert_record_query = """
+                INSERT INTO patient_doctor_records (appointment_id, patient_id, doctor_id, doctor_notes, patient_notes)
+                VALUES (%s, %s, %s, '', '')
+            """
+            cursor.execute(insert_record_query, (appointment_id, patient_id, doctor_id))
 
             conn.commit()
             cursor.close()
