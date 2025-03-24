@@ -8,11 +8,18 @@ from app.routes.view_doctor_appointments import doctor_view_appointments_bp
 from app.routes.notifications import notifications_bp
 from app.routes.doctor_availability import doctor_availability_bp
 from app.routes.doctor_patient_records import doctor_patient_records_bp
+import os
+
 
 
 def create_app():
     """Create and configure the Flask app."""
     app = Flask(__name__, template_folder="../frontend/pages", static_folder="../frontend/assets")
+    
+    #FILE UPLAOD SYSTEM
+    UPLOAD_FOLDER = 'static/uploads'
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     # ✅ Enable CORS (Cross-Origin Resource Sharing)
     CORS(app)
