@@ -8,17 +8,17 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("https://source.unsplash.com/1920x1080/?office,workspace") no-repeat
-      center center/cover;
+    url("https://source.unsplash.com/1920x1080/?office,workspace") no-repeat center center/cover;
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* ✅ Updated Navbar */
 .navbar {
   width: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  background-color: #007bff; /* Changed to blue */
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -27,15 +27,20 @@ body {
   margin-bottom: 2rem;
 }
 
-.navbar .brand {
-  font-size: 1.5rem;
-  color: #007bff;
+.navbar .navbar-brand,
+.navbar .nav-link {
+  color: white !important; /* Brand and links turned white */
   font-weight: bold;
+}
+
+.navbar .navbar-brand:hover,
+.navbar .nav-link:hover {
+  color: #f8f9fa !important;
 }
 
 .nav-app-name {
   text-decoration: none;
-  color: #007bff;
+  color: white;
 }
 
 /* 🔔 Notification Bell Styling */
@@ -48,7 +53,7 @@ body {
 
 .notification-icon {
   font-size: 28px;
-  color: #333;
+  color: white;
   transition: transform 0.2s ease-in-out;
 }
 
