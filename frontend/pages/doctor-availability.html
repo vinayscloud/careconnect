@@ -81,6 +81,26 @@ const times = [
   "16:00", "16:30"
 ];
 
+// Restrict the date picker to show only the next 15 days
+document.addEventListener("DOMContentLoaded", function () {
+    let dateInput = document.getElementById("availability-date");
+
+    if (dateInput) {
+        let today = new Date();
+        let minDate = today.toISOString().split("T")[0]; // Today's date
+        let maxDate = new Date();
+        maxDate.setDate(today.getDate() + 15); // 15 days from today
+        let maxDateFormatted = maxDate.toISOString().split("T")[0];
+
+        dateInput.setAttribute("min", minDate);
+        dateInput.setAttribute("max", maxDateFormatted);
+
+        // Set default date to today
+        dateInput.value = minDate;
+        fetchAvailability(); // Fetch availability for today's date by default
+    }
+});
+
 function fetchAvailability() {
   const date = document.getElementById('availability-date').value;
   if (!date) return;
