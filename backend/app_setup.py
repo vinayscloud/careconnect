@@ -8,8 +8,8 @@ from app.routes.view_doctor_appointments import doctor_view_appointments_bp
 from app.routes.notifications import notifications_bp
 from app.routes.doctor_availability import doctor_availability_bp
 from app.routes.doctor_patient_records import doctor_patient_records_bp
+from app.routes.doctor_update_profile import doctor_update_bp
 import os
-
 
 
 def create_app():
@@ -33,6 +33,7 @@ def create_app():
     app.register_blueprint(notifications_bp, url_prefix="/api")
     app.register_blueprint(doctor_availability_bp, url_prefix="/doctor-availability")
     app.register_blueprint(doctor_patient_records_bp, url_prefix="/records")
+    app.register_blueprint(doctor_update_bp)
 
     # ✅ Serve Frontend Pages
     @app.route('/')

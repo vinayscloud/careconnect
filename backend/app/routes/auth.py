@@ -72,7 +72,9 @@ def login_page():
             algorithm="HS256"
         )
 
-        session['token'] = token  # Store JWT in session
+        session['token'] = token # Store JWT in session
+        session['email'] = user['email']  # ✅ Required for doctor profile fetch
+
         return redirect(url_for('auth.dashboard'))
 
     return render_template('login.html')
@@ -99,18 +101,26 @@ def signup_page():
             if existing_user:
                 return jsonify({'error': "User already exists!"}), 400
 
-            # Insert new user
+            # Insert into users table
             cursor.execute(
                 "INSERT INTO users (username, email, password, role, user_status) VALUES (%s, %s, %s, %s, %s)",
                 (username, email, hashed_password, role, 'active')
             )
+
+            # ✅ Insert into doctors_profile if role is doctor
+            if role == 'doctor':
+                cursor.execute("""
+                    INSERT INTO doctors_profile (username, email, password, user_status)
+                    VALUES (%s, %s, %s, %s)
+                """, (username, email, hashed_password, 'active'))
+
             conn.commit()
             cursor.close()
             conn.close()
 
             return jsonify({'message': 'User created successfully!'}), 201
 
-        else:  # Handling form submission (if necessary)
+        else:  # Handling form submission
             username = request.form['username']
             email = request.form['email']
             password = request.form['password']
@@ -126,11 +136,19 @@ def signup_page():
             if existing_user:
                 return render_template('signup.html', error="User already exists!")
 
-            # Insert new user
+            # Insert into users table
             cursor.execute(
                 "INSERT INTO users (username, email, password, role, user_status) VALUES (%s, %s, %s, %s, %s)",
                 (username, email, hashed_password, role, 'active')
             )
+
+            # ✅ Insert into doctors_profile if role is doctor
+            if role == 'doctor':
+                cursor.execute("""
+                    INSERT INTO doctors_profile (username, email, password, user_status)
+                    VALUES (%s, %s, %s, %s)
+                """, (username, email, hashed_password, 'active'))
+
             conn.commit()
             cursor.close()
             conn.close()
@@ -143,10 +161,23 @@ def signup_page():
 @auth_bp.route('/dashboard', methods=['GET'])
 @token_required
 def dashboard(current_user):
-    if current_user['role'] == 'patient':
-        return render_template('patient-user-dashboard.html', user=current_user)
-    elif current_user['role'] == 'doctor':
+    if current_user['role'] == 'doctor':
+        # ✅ Check if doctor profile is complete
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM doctors_profile WHERE email = %s", (current_user['email'],))
+        profile = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        required_fields = ['full_name', 'specialty', 'phone', 'address', 'experience', 'bio']
+        if any(not profile.get(field) for field in required_fields):
+            return render_template('doctor_update_profile.html')
+
         return render_template('doctor-user-dashboard.html', user=current_user)
+
+    elif current_user['role'] == 'patient':
+        return render_template('patient-user-dashboard.html', user=current_user)
     elif current_user['role'] == 'admin':
         return render_template('admin-user-dashboard.html', user=current_user)
     else:
