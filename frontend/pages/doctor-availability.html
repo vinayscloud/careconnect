@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Doctor Availability | CareConnect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Bootstrap CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 
   <style>
     body {
@@ -18,8 +22,18 @@
       background-color: #007bff;
     }
 
-    .navbar-brand, .nav-link {
+    .navbar-brand,
+    .nav-link {
       color: #fff !important;
+    }
+
+    .navbar-nav .nav-link {
+      transition: color 0.2s ease-in-out;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #ffe082 !important;
+      /* light amber highlight */
     }
 
     .availability-container {
@@ -71,130 +85,160 @@
 
 <body>
 
-<!-- ✅ Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#">CareConnect</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="{{ request.path }}">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='notifications') }}">Notifications</a></li>
-        {% if session['token'] %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirm('Logout?')">Logout</a></li>
-        {% else %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
-        {% endif %}
-      </ul>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+        <i class="fas fa-heartbeat mr-2"></i> <strong>CareConnect</strong>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+              <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='notifications') }}">
+              <i class="fas fa-bell mr-2"></i> Notifications
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center"
+              href="{{ url_for('load_page', page_name='doctor_update_profile') }}">
+              <i class="fas fa-user-edit mr-2"></i> Profile
+            </a>
+          </li>
+          {% if session['token'] %}
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
+              onclick="return confirmLogout();">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='login') }}">
+              <i class="fas fa-sign-in-alt mr-2"></i> Login
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+
+  <!-- ✅ Availability Section -->
+  <div class="availability-container">
+    <h3 class="text-center mb-4">🗓️ Manage My Availability</h3>
+
+    <div class="mb-4 text-center">
+      <label for="availability-date" class="form-label fw-semibold">Select Date:</label>
+      <input type="date" id="availability-date" class="form-control d-inline-block w-auto">
+    </div>
+
+    <div id="time-slots" class="text-center"></div>
+
+    <div class="text-center">
+      <button class="btn submit-btn" onclick="submitAvailability()">Update Availability</button>
     </div>
   </div>
-</nav>
 
-<!-- ✅ Availability Section -->
-<div class="availability-container">
-  <h3 class="text-center mb-4">🗓️ Manage My Availability</h3>
+  <!-- ✅ Scripts -->
+  <script>
+    const times = [
+      "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+      "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
+      "16:00", "16:30"
+    ];
 
-  <div class="mb-4 text-center">
-    <label for="availability-date" class="form-label fw-semibold">Select Date:</label>
-    <input type="date" id="availability-date" class="form-control d-inline-block w-auto">
-  </div>
+    document.addEventListener("DOMContentLoaded", function () {
+      const dateInput = document.getElementById("availability-date");
+      const today = new Date();
+      const minDate = today.toISOString().split("T")[0];
+      const maxDate = new Date(today);
+      maxDate.setDate(today.getDate() + 15);
+      const maxDateFormatted = maxDate.toISOString().split("T")[0];
 
-  <div id="time-slots" class="text-center"></div>
+      dateInput.setAttribute("min", minDate);
+      dateInput.setAttribute("max", maxDateFormatted);
+      dateInput.value = minDate;
 
-  <div class="text-center">
-    <button class="btn submit-btn" onclick="submitAvailability()">Update Availability</button>
-  </div>
-</div>
-
-<!-- ✅ Scripts -->
-<script>
-const times = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
-  "16:00", "16:30"
-];
-
-document.addEventListener("DOMContentLoaded", function () {
-  const dateInput = document.getElementById("availability-date");
-  const today = new Date();
-  const minDate = today.toISOString().split("T")[0];
-  const maxDate = new Date(today);
-  maxDate.setDate(today.getDate() + 15);
-  const maxDateFormatted = maxDate.toISOString().split("T")[0];
-
-  dateInput.setAttribute("min", minDate);
-  dateInput.setAttribute("max", maxDateFormatted);
-  dateInput.value = minDate;
-
-  fetchAvailability(); // Default load
-});
-
-document.getElementById('availability-date').addEventListener('change', fetchAvailability);
-
-function fetchAvailability() {
-  const date = document.getElementById('availability-date').value;
-  if (!date) return;
-
-  fetch(`/doctor-availability/get_availability?date=${date}`)
-    .then(res => res.json())
-    .then(data => {
-      const timeSlotsContainer = document.getElementById('time-slots');
-      timeSlotsContainer.innerHTML = '';
-
-      times.forEach((time) => {
-        const slot = document.createElement('div');
-        slot.classList.add('slot');
-        slot.textContent = time;
-        slot.dataset.time = time;
-
-        const slotData = data.find(item => item.start_time === time);
-
-        if (slotData) {
-          if (slotData.is_booked === 'Y') {
-            slot.classList.add('booked');
-          } else if (slotData.is_available === 'N') {
-            slot.classList.add('not-available');
-          } else {
-            slot.classList.add('available');
-          }
-        } else {
-          slot.classList.add('not-available');
-        }
-
-        slot.onclick = toggleAvailability;
-        timeSlotsContainer.appendChild(slot);
-      });
+      fetchAvailability(); // Default load
     });
-}
 
-function toggleAvailability(event) {
-  const slot = event.target;
-  if (slot.classList.contains('booked')) return;
+    document.getElementById('availability-date').addEventListener('change', fetchAvailability);
 
-  slot.classList.toggle('available');
-  slot.classList.toggle('not-available');
-}
+    function fetchAvailability() {
+      const date = document.getElementById('availability-date').value;
+      if (!date) return;
 
-function submitAvailability() {
-  const date = document.getElementById('availability-date').value;
-  const slots = document.querySelectorAll('.slot');
-  const availabilityData = Array.from(slots).map(slot => ({
-    time: slot.dataset.time,
-    status: slot.classList.contains('available') ? 'Y' : 'N'
-  }));
+      fetch(`/doctor-availability/get_availability?date=${date}`)
+        .then(res => res.json())
+        .then(data => {
+          const timeSlotsContainer = document.getElementById('time-slots');
+          timeSlotsContainer.innerHTML = '';
 
-  fetch('/doctor-availability/update_availability', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date, availability: availabilityData })
-  })
-  .then(res => res.json())
-  .then(data => alert(data.message));
-}
-</script>
+          times.forEach((time) => {
+            const slot = document.createElement('div');
+            slot.classList.add('slot');
+            slot.textContent = time;
+            slot.dataset.time = time;
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            const slotData = data.find(item => item.start_time === time);
+
+            if (slotData) {
+              if (slotData.is_booked === 'Y') {
+                slot.classList.add('booked');
+              } else if (slotData.is_available === 'N') {
+                slot.classList.add('not-available');
+              } else {
+                slot.classList.add('available');
+              }
+            } else {
+              slot.classList.add('not-available');
+            }
+
+            slot.onclick = toggleAvailability;
+            timeSlotsContainer.appendChild(slot);
+          });
+        });
+    }
+
+    function toggleAvailability(event) {
+      const slot = event.target;
+      if (slot.classList.contains('booked')) return;
+
+      slot.classList.toggle('available');
+      slot.classList.toggle('not-available');
+    }
+
+    function submitAvailability() {
+      const date = document.getElementById('availability-date').value;
+      const slots = document.querySelectorAll('.slot');
+      const availabilityData = Array.from(slots).map(slot => ({
+        time: slot.dataset.time,
+        status: slot.classList.contains('available') ? 'Y' : 'N'
+      }));
+
+      fetch('/doctor-availability/update_availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, availability: availabilityData })
+      })
+        .then(res => res.json())
+        .then(data => alert(data.message));
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

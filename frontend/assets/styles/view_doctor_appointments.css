@@ -1,12 +1,4 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
-}
-
-.container {
+.container-box {
     max-width: 800px;
     margin: auto;
     background: white;

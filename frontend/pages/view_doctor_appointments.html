@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Portal - Appointments</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
         }
 
-        /* Navbar - Fixed Normal Size */
         .navbar {
             background-color: #007bff;
             color: #fff;
-            min-height: 20px;
         }
 
         .navbar .nav-link {
             color: #fff !important;
-            padding: 0.5rem 1rem;
         }
 
-        .navbar-brand {
+        .navbar .navbar-brand {
             font-size: 1.5rem;
             font-weight: bold;
         }
 
-        .navbar-toggler {
-            border: none;
+        .navbar-nav .nav-link {
+            transition: color 0.2s ease-in-out;
         }
 
-        .container {
+        .navbar-nav .nav-link:hover {
+            color: #ffe082 !important;
+            /* light amber highlight */
+        }
+
+
+        .container-box {
             margin-top: 80px;
         }
 
@@ -63,28 +70,63 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('auth.dashboard') }}">CareConnect</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+                <i class="fas fa-heartbeat mr-2"></i> <strong>CareConnect</strong>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.dashboard') }}">Home</a></li>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+                            <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ url_for('load_page', page_name='notifications') }}">
+                            <i class="fas fa-bell mr-2"></i> Notifications
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ url_for('load_page', page_name='doctor_update_profile') }}">
+                            <i class="fas fa-user-edit mr-2"></i> Profile
+                        </a>
+                    </li>
                     {% if session['token'] %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
+                            onclick="return confirmLogout();">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ url_for('load_page', page_name='login') }}">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
+
     <!-- Main Content -->
-    <div class="container">
+    <div class="container container-box">
         <div class="text-center my-4">
             <h1 class="text-primary">Doctor Portal</h1>
             <h3 class="text-muted">Welcome, Doctor</h3>
@@ -113,7 +155,8 @@
         </div>
 
         <!-- Search Bar -->
-        <input type="text" id="searchInput" class="form-control search-bar" placeholder="Search by patient name, email, phone, or date...">
+        <input type="text" id="searchInput" class="form-control search-bar"
+            placeholder="Search by patient name, email, phone, or date...">
 
         <!-- Appointments Table -->
         <div class="table-container">
@@ -138,6 +181,8 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             fetchDoctorAppointments();
@@ -150,19 +195,19 @@
                     "Content-Type": "application/json"
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    populateAppointmentsTable(data.appointments);
-                    updateStatistics(data.appointments);
-                } else {
-                    alert("Error fetching appointments: " + data.error);
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Failed to load appointments.");
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        populateAppointmentsTable(data.appointments);
+                        updateStatistics(data.appointments);
+                    } else {
+                        alert("Error fetching appointments: " + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Failed to load appointments.");
+                });
         }
 
         function populateAppointmentsTable(appointments) {
@@ -238,6 +283,7 @@
         }
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

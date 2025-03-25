@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ontario Health</title>
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -26,41 +30,76 @@
             font-weight: bold;
         }
 
+        .navbar-nav .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ffe082 !important;
+            /* light amber highlight */
+        }
+
+
         .hero {
-            background: linear-gradient(rgba(0, 123, 255, 0.2), rgba(0, 123, 255, 0.2)), 
-                        url('{{ url_for("static", filename="images/family-doctor.JPG") }}') no-repeat center center;
+            position: relative;
+            background: url('{{ url_for("static", filename="images/family-doctor.JPG") }}') no-repeat center center;
             background-size: cover;
-            background-position: center 20%;
-            color: #fff;
             min-height: 400px;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
+            padding: 2rem;
+            z-index: 1;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.532);
+            /* Ontario Blue Overlay */
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
+            font-weight: 700;
             margin-bottom: 1rem;
         }
 
-        .hero-content p {
-            font-size: 1.2rem;
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
         }
 
-        .hero-content a {
+        .hero a {
             background-color: #fff;
             color: #007bff;
             padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
         }
 
-        .hero-content a:hover {
+        .hero a:hover {
             background-color: #0056b3;
             color: #fff;
         }
+
 
         .feature-card {
             transition: transform 0.3s;
@@ -102,22 +141,53 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Navbar Section -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">CareConnect</a>
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="fas fa-heartbeat mr-2"></i> <strong>CareConnect</strong>
+            </a>
+
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+                            <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ url_for('load_page', page_name='notifications') }}">
+                            <i class="fas fa-bell mr-2"></i> Notifications
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ url_for('load_page', page_name='doctor-profile') }}">
+                            <i class="fas fa-user-edit mr-2"></i> Doctors
+                        </a>
+                    </li>
                     {% if session['token'] %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
+                            onclick="return confirmLogout();">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ url_for('load_page', page_name='login') }}">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
@@ -125,20 +195,22 @@
     </nav>
 
     <!-- Hero Section -->
-    <div class="hero">
+    <section class="hero">
         <div class="hero-content">
             <h1>Ontario Health</h1>
             <p>We support better care for all by connecting and coordinating Ontario's health system.</p>
-            <a href="{{ url_for('load_page', page_name='learn-more') }}" class="btn btn-light">Learn More</a>
+            <a href="{{ url_for('load_page', page_name='learn-more') }}">Learn More</a>
         </div>
-    </div>
+    </section>
+
 
     <!-- Features Section -->
     <div class="container my-5">
         <div class="row">
             <div class="col-md-4">
                 <div class="card feature-card text-center p-3">
-                    <img src="{{ url_for('static', filename='images/coordinated-care.jpg') }}" alt="Coordinated Care" class="card-img-top mx-auto" style="width: 100px;">
+                    <img src="{{ url_for('static', filename='images/coordinated-care.jpg') }}" alt="Coordinated Care"
+                        class="card-img-top mx-auto" style="width: 100px;">
                     <div class="card-body">
                         <h5 class="card-title">Coordinated Care</h5>
                         <p class="card-text">Ensuring seamless healthcare services for everyone.</p>
@@ -147,7 +219,8 @@
             </div>
             <div class="col-md-4">
                 <div class="card feature-card text-center p-3">
-                    <img src="{{ url_for('static', filename='images/support-service.jpeg') }}" alt="Support Services" class="card-img-top mx-auto" style="width: 100px;">
+                    <img src="{{ url_for('static', filename='images/support-service.jpeg') }}" alt="Support Services"
+                        class="card-img-top mx-auto" style="width: 100px;">
                     <div class="card-body">
                         <h5 class="card-title">Support Services</h5>
                         <p class="card-text">Providing support to enhance the patient experience.</p>
@@ -156,7 +229,8 @@
             </div>
             <div class="col-md-4">
                 <div class="card feature-card text-center p-3">
-                    <img src="{{ url_for('static', filename='images/timely-access.jpg') }}" alt="Timely Access" class="card-img-top mx-auto" style="width: 100px;">
+                    <img src="{{ url_for('static', filename='images/timely-access.jpg') }}" alt="Timely Access"
+                        class="card-img-top mx-auto" style="width: 100px;">
                     <div class="card-body">
                         <h5 class="card-title">Timely Access</h5>
                         <p class="card-text">Connecting you to care when you need it most.</p>
@@ -169,11 +243,13 @@
     <!-- Testimonials Section -->
     <section class="container my-5">
         <h2 class="text-center text-primary mb-4">What Our Users Say</h2>
-        <div id="testimonialCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+        <div id="testimonialCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
+            data-bs-interval="5000">
             <div class="carousel-inner">
                 <div class="carousel-item active">
                     <div class="testimonial">
-                        <img src="{{ url_for('static', filename='images/user1.png') }}" alt="User 1" class="testimonial-img">
+                        <img src="{{ url_for('static', filename='images/user1.png') }}" alt="User 1"
+                            class="testimonial-img">
                         <h4>Sarah Thompson</h4>
                         <p class="testimonial-text">"CareConnect has made booking doctor appointments so easy!"</p>
                         <div class="stars">⭐⭐⭐⭐⭐</div>
@@ -181,7 +257,8 @@
                 </div>
                 <div class="carousel-item">
                     <div class="testimonial">
-                        <img src="{{ url_for('static', filename='images/user2.jpg') }}" alt="User 2" class="testimonial-img">
+                        <img src="{{ url_for('static', filename='images/user2.jpg') }}" alt="User 2"
+                            class="testimonial-img">
                         <h4>Michael Lee</h4>
                         <p class="testimonial-text">"The notification system is a lifesaver!"</p>
                         <div class="stars">⭐⭐⭐⭐⭐</div>
@@ -190,22 +267,23 @@
             </div>
 
             <!-- Carousel Controls (Next & Previous Buttons) -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+            <!-- <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon"></span>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
                 <span class="carousel-control-next-icon"></span>
-            </button>
+            </button> -->
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer bg-dark text-white text-center py-4">
-        <div class="container">
+    <footer class="footer bg-dark text-white text-center">
+        <div class="container pt-2 pb-1">
             <p>&copy; 2024 CareConnect. All Rights Reserved.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

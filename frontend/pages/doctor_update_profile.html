@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor Profile - CareConnect</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .navbar {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .navbar .nav-link {
+      color: #fff !important;
+    }
+
+    .navbar .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .container-box {
+      max-width: 800px;
+      margin-top: 3rem;
+      margin-bottom: 3rem;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group label {
+      font-weight: 600;
+    }
+
+    .message {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    .badge {
+      font-size: 1rem;
+      padding: 0.5em 1em;
+    }
+
+    .navbar-nav .nav-link {
+      transition: color 0.2s ease-in-out;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #d2ff3f !important;
+      /* light amber highlight */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top" id="mainNavbar">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+        <i class="fas fa-heartbeat mr-2"></i> <strong>CareConnect</strong>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+              <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='notifications') }}">
+              <i class="fas fa-bell mr-2"></i> Notifications
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center"
+              href="{{ url_for('load_page', page_name='doctor_update_profile') }}">
+              <i class="fas fa-user-edit mr-2"></i> Profile
+            </a>
+          </li>
+          {% if session['token'] %}
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
+              onclick="return confirmLogout();">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='login') }}">
+              <i class="fas fa-sign-in-alt mr-2"></i> Login
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+
+  <!-- Profile Form -->
+  <div class="container container-box">
+    <h2 class="mb-4 text-center" id="formTitle">Loading...</h2>
+    <form id="updateForm">
+
+      <div class="form-group">
+        <label>Your Current Status for Taking Appointments</label>
+        <div class="d-flex align-items-center">
+          <span id="statusBadge" class="badge badge-success mr-3">Active</span>
+          <select class="form-control w-auto" id="user_status" name="user_status">
+            <option value="active">Available for Consultations</option>
+            <option value="deactive">Not Taking Consultations</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" class="form-control" name="username" id="username" readonly>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="form-control" name="email" id="email" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" class="form-control" name="full_name" id="full_name" required>
+      </div>
+
+      <!-- Specialty Dropdown -->
+      <div class="form-group">
+        <label>Specialty</label>
+        <select class="form-control" name="specialty" id="specialty" required>
+          <option value="">Select a specialty</option>
+          <option>Cardiologist</option>
+          <option>Neurologist</option>
+          <option>Dermatologist</option>
+          <option>Orthopedic Surgeon</option>
+          <option>Endocrinologist</option>
+          <option>Gastroenterologist</option>
+          <option>Pulmonologist</option>
+          <option>Nephrologist</option>
+          <option>Hematologist</option>
+          <option>Oncologist</option>
+          <option>Ophthalmologist</option>
+          <option>Otolaryngologist (ENT Specialist)</option>
+          <option>Pediatrician</option>
+          <option>Rheumatologist</option>
+          <option>Urologist</option>
+          <option>Gynecologist</option>
+          <option>Obstetrician</option>
+          <option>Psychiatrist</option>
+          <option>Physiotherapist</option>
+          <option>Anesthesiologist</option>
+          <option>General Surgeon</option>
+          <option>Plastic Surgeon</option>
+          <option>Radiologist</option>
+          <option>Pathologist</option>
+          <option>Geriatrician</option>
+        </select>
+      </div>
+
+      <!-- Canadian Phone Format -->
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" class="form-control" name="phone" id="phone" required pattern="^\d{3}-\d{3}-\d{4}$"
+          placeholder="e.g. 416-555-1234">
+        <small class="form-text text-muted">Format: XXX-XXX-XXXX</small>
+      </div>
+
+
+      <!-- Address (Max 25 words) -->
+      <div class="form-group">
+        <label>Clinic Address</label>
+        <input type="text" class="form-control" name="address" id="address" required maxlength="300">
+        <small class="form-text text-muted">Limit: 25 words</small>
+      </div>
+
+      <!-- Experience (0–99) -->
+      <div class="form-group">
+        <label>Experience (Years)</label>
+        <input type="number" class="form-control" name="experience" id="experience" min="0" max="99" required>
+      </div>
+
+      <!-- Bio (Max 50 words) -->
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea class="form-control" name="bio" id="bio" rows="3" required maxlength="500"></textarea>
+        <small class="form-text text-muted">Limit: 50 words</small>
+      </div>
+
+      <button type="submit" id="saveProfileBtn" class="btn btn-primary mt-3">Save Changes</button>
+      <button type="button" id="cancelBtn" class="btn btn-secondary mt-3 ml-2">Cancel</button>
+
+    </form>
+
+    <!-- Change Password -->
+    <div id="passwordChangeContainer" class="mt-5" style="display: none;">
+      <hr />
+      <h4 class="mb-3">Change Password</h4>
+      <form id="passwordForm">
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" class="form-control" id="new_password" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" class="form-control" id="confirm_password" required>
+        </div>
+        <button type="submit" class="btn btn-warning">Change Password</button>
+        <div id="passwordMsg" class="message text-success text-center mt-3"></div>
+      </form>
+    </div>
+
+    <div id="msg" class="message text-success text-center"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function confirmLogout() {
+      return confirm("Are you sure you want to logout?");
+    }
+
+    function limitWords(fieldId, limit) {
+      const field = document.getElementById(fieldId);
+      field.addEventListener("input", function () {
+        const words = this.value.trim().split(/\s+/);
+        if (words.length > limit) {
+          this.value = words.slice(0, limit).join(" ");
+        }
+      });
+    }
+
+    limitWords("address", 25);
+    limitWords("bio", 50);
+
+    async function loadProfile() {
+      const res = await fetch('/api/doctor/update-profile');
+      const data = await res.json();
+
+      for (const key in data) {
+        const field = document.getElementById(key);
+        if (field) field.value = data[key];
+      }
+
+      const isComplete = data.is_complete;
+      document.getElementById("formTitle").innerText = isComplete ? "Update Doctor Profile" : "Complete Your Doctor Profile";
+      document.getElementById("saveProfileBtn").innerText = isComplete ? "Save Changes" : "Save & Go to Dashboard";
+      document.getElementById("saveProfileBtn").dataset.redirect = !isComplete;
+      document.getElementById("mainNavbar").style.display = isComplete ? "flex" : "none";
+      document.getElementById("passwordChangeContainer").style.display = isComplete ? "block" : "none";
+
+      // Hide cancel button if showing "Save Changes"
+      document.getElementById("cancelBtn").style.display = isComplete ? "none" : "inline-block";
+
+      // Load status toggle
+      const userStatusSelect = document.getElementById("user_status");
+      const statusBadge = document.getElementById("statusBadge");
+
+
+      const status = data.user_status && data.user_status.trim() ? data.user_status : "active";
+      userStatusSelect.value = status;
+
+      const statusText = status === "active"
+        ? "Available for Consultations"
+        : "Not Taking Consultations";
+
+      statusBadge.textContent = statusText;
+      statusBadge.className = status === "active"
+        ? "badge badge-success mr-3"
+        : "badge badge-warning mr-3";
+
+      userStatusSelect.addEventListener("change", () => {
+        const status = userStatusSelect.value;
+        const statusText = status === "active"
+          ? "Available for Consultations"
+          : "Not Taking Consultations";
+
+        statusBadge.textContent = statusText;
+        statusBadge.className = status === "active"
+          ? "badge badge-success mr-3"
+          : "badge badge-warning mr-3";
+      });
+
+    }
+
+    document.getElementById("phone").addEventListener("input", function (e) {
+      let input = e.target.value.replace(/\D/g, ''); // Remove non-digits
+      if (input.length > 10) input = input.substring(0, 10);
+
+      let formatted = '';
+      if (input.length > 0) {
+        formatted += input.substring(0, 3);
+      }
+      if (input.length >= 4) {
+        formatted += '-' + input.substring(3, 6);
+      }
+      if (input.length >= 7) {
+        formatted += '-' + input.substring(6, 10);
+      }
+
+      e.target.value = formatted;
+    });
+
+
+    document.getElementById("updateForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const jsonData = {};
+      formData.forEach((value, key) => jsonData[key] = value);
+      // jsonData['user_status'] = document.getElementById("user_status").checked ? "active" : "deactive";
+      // ✅ Add user status manually from dropdown
+      jsonData['user_status'] = document.getElementById("user_status").value;
+
+
+      const res = await fetch('/api/doctor/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jsonData)
+      });
+
+      const result = await res.json();
+      document.getElementById("msg").innerText = result.message;
+
+      const shouldRedirect = document.getElementById("saveProfileBtn").dataset.redirect === "true";
+      if (shouldRedirect) {
+        setTimeout(() => window.location.href = "{{ url_for('auth.dashboard') }}", 1200);
+      }
+    });
+
+    document.getElementById("passwordForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const newPassword = document.getElementById("new_password").value;
+      const confirmPassword = document.getElementById("confirm_password").value;
+
+      if (newPassword !== confirmPassword) {
+        document.getElementById("passwordMsg").innerText = "❌ Passwords do not match!";
+        return;
+      }
+
+      const res = await fetch('/api/doctor/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ new_password: newPassword, confirm_password: confirmPassword })
+      });
+
+      const result = await res.json();
+      document.getElementById("passwordMsg").innerText = result.message;
+    });
+
+    loadProfile();
+
+    document.getElementById("cancelBtn").addEventListener("click", function () {
+      window.location.href = "{{ url_for('load_page', page_name='login') }}";
+    });
+
+  </script>
+
+</body>
+
+</html>

@@ -1,165 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Doctor Profile</title>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f8f9fa;
-      }
 
-      .navbar {
-        background-color: #007bff;
-        color: #fff;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor Profile</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
 
-      .navbar .nav-link {
-        color: #fff !important;
-        padding: 0.5rem 1rem;
-      }
+    .navbar {
+      background-color: #007bff;
+      color: #fff;
+    }
 
-      .navbar .navbar-brand {
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
+    .navbar .nav-link {
+      color: #fff !important;
+      padding: 0.5rem 1rem;
+    }
 
-      .card-hover {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
+    .navbar .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
 
-      .card-hover:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Navbar Section -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-      <div class="container">
-        <a class="navbar-brand" href="{{ url_for('auth.dashboard') }}">CareConnect</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.dashboard') }}">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor-profile') }}">Doctors</a></li>
-            
-            
-            {% if session['token'] %}
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirmLogout();">Logout</a></li>
-            {% else %}
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">Login</a></li>
-            {% endif %}
-          </ul>
-        </div>
+    .navbar-nav .nav-link {
+      transition: color 0.2s ease-in-out;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #ffe082 !important;
+      /* light amber highlight */
+    }
+
+
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar Section -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+        <i class="fas fa-heartbeat mr-2"></i> <strong>CareConnect</strong>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+              <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='notifications') }}">
+              <i class="fas fa-bell mr-2"></i> Notifications
+            </a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='doctor-profile') }}">
+              <i class="fas fa-user-edit mr-2"></i> Doctors
+            </a>
+          </li> -->
+          {% if session['token'] %}
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
+              onclick="return confirmLogout();">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='login') }}">
+              <i class="fas fa-sign-in-alt mr-2"></i> Login
+            </a>
+          </li>
+          {% endif %}
+        </ul>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <!-- Search and Filter Section -->
-    <div class="container my-4">
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fas fa-search"></i></span>
-        </div>
-        <input type="text" id="searchInput" class="form-control" placeholder="Search doctors by name, specialty, or location..." />
-        <div class="input-group-append">
-          <button id="clearButton" class="btn btn-secondary" type="button"><i class="fas fa-times"></i></button>
-          <button id="searchButton" class="btn btn-primary" type="button">Search</button>
-        </div>
+  <!-- Search and Filter Section -->
+  <div class="container my-4">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
       </div>
-
-      <div class="row">
-        <div class="col-md-3 mb-3">
-          <select id="specialtyFilter" class="form-control">
-            <option value="">All Specialties</option>
-            <option value="Cardiologist">Cardiologist</option>
-            <option value="Dermatologist">Dermatologist</option>
-            <option value="Neurologist">Neurologist</option>
-            <option value="Pediatrician">Pediatrician</option>
-          </select>
-        </div>
-        <div class="col-md-3 mb-3">
-          <select id="cityFilter" class="form-control">
-            <option value="">All Cities</option>
-            <option value="New York">New York</option>
-            <option value="Los Angeles">Los Angeles</option>
-            <option value="Chicago">Chicago</option>
-          </select>
-        </div>
-        <div class="col-md-3 mb-3">
-          <input type="number" id="experienceFilter" class="form-control" placeholder="Min Experience (years)" min="0" />
-        </div>
-        <div class="col-md-3 mb-3">
-          <input type="number" id="ratingFilter" class="form-control" placeholder="Min Rating (1-5)" min="1" max="5" step="0.1" />
-        </div>
+      <input type="text" id="searchInput" class="form-control"
+        placeholder="Search doctors by name, specialty, or location..." />
+      <div class="input-group-append">
+        <button id="clearButton" class="btn btn-secondary" type="button"><i class="fas fa-times"></i></button>
+        <button id="searchButton" class="btn btn-primary" type="button">Search</button>
       </div>
     </div>
 
-    <!-- Doctor Profiles Section -->
-    <div class="container" id="doctorProfiles"></div>
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <select id="specialtyFilter" class="form-control">
+          <option value="">All Specialties</option>
+          <option value="Cardiologist">Cardiologist</option>
+          <option value="Dermatologist">Dermatologist</option>
+          <option value="Neurologist">Neurologist</option>
+          <option value="Pediatrician">Pediatrician</option>
+        </select>
+      </div>
+      <div class="col-md-3 mb-3">
+        <select id="cityFilter" class="form-control">
+          <option value="">All Cities</option>
+          <option value="New York">New York</option>
+          <option value="Los Angeles">Los Angeles</option>
+          <option value="Chicago">Chicago</option>
+        </select>
+      </div>
+      <div class="col-md-3 mb-3">
+        <input type="number" id="experienceFilter" class="form-control" placeholder="Min Experience (years)" min="0" />
+      </div>
+      <div class="col-md-3 mb-3">
+        <input type="number" id="ratingFilter" class="form-control" placeholder="Min Rating (1-5)" min="1" max="5"
+          step="0.1" />
+      </div>
+    </div>
+  </div>
 
-    <script>
-      function confirmLogout() {
-        return confirm("Are you sure you want to logout?");
-      }
+  <!-- Doctor Profiles Section -->
+  <div class="container" id="doctorProfiles"></div>
 
-      document.getElementById('clearButton').addEventListener('click', () => {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('specialtyFilter').value = '';
-        document.getElementById('cityFilter').value = '';
-        document.getElementById('experienceFilter').value = '';
-        document.getElementById('ratingFilter').value = '';
-        fetchDoctors(); 
-      });
+  <script>
+    function confirmLogout() {
+      return confirm("Are you sure you want to logout?");
+    }
 
-      async function fetchDoctors() {
-        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-        const specialty = document.getElementById('specialtyFilter').value;
-        const city = document.getElementById('cityFilter').value;
-        const minExperience = document.getElementById('experienceFilter').value;
-        const minRating = document.getElementById('ratingFilter').value;
+    document.getElementById('clearButton').addEventListener('click', () => {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('specialtyFilter').value = '';
+      document.getElementById('cityFilter').value = '';
+      document.getElementById('experienceFilter').value = '';
+      document.getElementById('ratingFilter').value = '';
+      fetchDoctors();
+    });
 
-        let queryParams = `?search=${searchQuery}`;
-        if (specialty) queryParams += `&specialty=${specialty}`;
-        if (city) queryParams += `&city=${city}`;
-        if (minExperience) queryParams += `&min_experience=${minExperience}`;
-        if (minRating) queryParams += `&min_rating=${minRating}`;
+    async function fetchDoctors() {
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const specialty = document.getElementById('specialtyFilter').value;
+      const city = document.getElementById('cityFilter').value;
+      const minExperience = document.getElementById('experienceFilter').value;
+      const minRating = document.getElementById('ratingFilter').value;
 
-        const response = await fetch(`/api/doctors${queryParams}`);
-        const doctors = await response.json();
-        renderDoctors(doctors);
-      }
+      let queryParams = `?search=${searchQuery}`;
+      if (specialty) queryParams += `&specialty=${specialty}`;
+      if (city) queryParams += `&city=${city}`;
+      if (minExperience) queryParams += `&min_experience=${minExperience}`;
+      if (minRating) queryParams += `&min_rating=${minRating}`;
 
-      function renderDoctors(doctors) {
-        const profilesContainer = document.getElementById('doctorProfiles');
-        profilesContainer.innerHTML = doctors.length ? '' : '<p>No doctors found.</p>';
+      const response = await fetch(`/api/doctors${queryParams}`);
+      const doctors = await response.json();
+      renderDoctors(doctors);
+    }
 
-        let row = null;
+    function renderDoctors(doctors) {
+      const profilesContainer = document.getElementById('doctorProfiles');
+      profilesContainer.innerHTML = doctors.length ? '' : '<p>No doctors found.</p>';
 
-        doctors.forEach((doctor, index) => {
-          if (index % 4 === 0) {
-            row = document.createElement('div');
-            row.className = 'row mb-4';
-            profilesContainer.appendChild(row);
-          }
+      let row = null;
 
-          const doctorCard = document.createElement('div');
-          doctorCard.className = 'col-md-3 mb-4';
-          doctorCard.innerHTML = `
+      doctors.forEach((doctor, index) => {
+        if (index % 4 === 0) {
+          row = document.createElement('div');
+          row.className = 'row mb-4';
+          profilesContainer.appendChild(row);
+        }
+
+        const doctorCard = document.createElement('div');
+        doctorCard.className = 'col-md-3 mb-4';
+        doctorCard.innerHTML = `
             <div class="card h-100 card-hover">
               <img src= "{{ url_for('static', filename='images/doc4.jpg') }}" class="card-img-top" alt="${doctor.name}">
               <div class="card-body">
@@ -172,15 +203,16 @@
               </div>
             </div>
           `;
-          
-          row.appendChild(doctorCard);
-        });
-      }
 
-      document.getElementById('searchButton').addEventListener('click', fetchDoctors);
-      fetchDoctors();
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+        row.appendChild(doctorCard);
+      });
+    }
+
+    document.getElementById('searchButton').addEventListener('click', fetchDoctors);
+    fetchDoctors();
+  </script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
 </html>

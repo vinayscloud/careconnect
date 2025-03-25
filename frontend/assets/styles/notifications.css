@@ -8,7 +8,8 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("https://source.unsplash.com/1920x1080/?office,workspace") no-repeat center center/cover;
+    url("https://source.unsplash.com/1920x1080/?office,workspace") no-repeat
+      center center/cover;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -30,7 +31,6 @@ body {
 .navbar .navbar-brand,
 .navbar .nav-link {
   color: white !important; /* Brand and links turned white */
-  font-weight: bold;
 }
 
 .navbar .navbar-brand:hover,
@@ -82,17 +82,18 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 600px;
+  max-width: 900px;
   margin: 2rem auto;
   padding: 1.5rem;
   backdrop-filter: blur(10px);
 }
 
 .notifications-panel h1 {
+  font-weight: bold;
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 2rem;
-  color: #333;
+  color: #007bff;
 }
 
 /* 📝 Notification Item Styling */
