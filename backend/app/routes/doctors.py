@@ -31,7 +31,7 @@ def get_doctors():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        query = "SELECT id, name, specialty, location, experience, rating FROM doctors WHERE 1=1"
+        query = "SELECT id, name, specialty, location, experience, rating, photo_url FROM doctors WHERE 1=1"
         params = []
 
         if filters["search"]:
