@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template
 import mysql.connector
 from flask_cors import CORS
-from app.db_config import db_config , get_db_connection
+from app.db_config import db_config, get_db_connection
 from app.routes.auth import token_required
 
 appointments_bp = Blueprint('appointments', __name__)
@@ -11,12 +11,11 @@ appointments_bp = Blueprint('appointments', __name__)
 @token_required
 def booking_form(current_user):
     if request.method == 'GET':
-        doctor_id = request.args.get('doctorId')  # Retrieve doctorId from URL parameters
+        doctor_id = request.args.get('doctorId')
 
         if not doctor_id:
-            return jsonify({"error": "Doctor ID is required"}), 400  # Handle missing doctor ID
+            return jsonify({"error": "Doctor ID is required"}), 400
 
-        # Directly using mysql.connector.connect for database connection
         try:
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
@@ -26,22 +25,19 @@ def booking_form(current_user):
             conn.close()
 
             if doctor:
-                return render_template('booking-form.html', doctor=doctor, patient_id=current_user['id'])  # Pass doctor details & patient_id
+                return render_template('booking-form.html', doctor=doctor, patient_id=current_user['id'])
             else:
-                return jsonify({"error": "Doctor not found"}), 404  # Handle invalid doctor ID
+                return jsonify({"error": "Doctor not found"}), 404
 
         except mysql.connector.Error as err:
             return jsonify({"error": f"Database error: {str(err)}"}), 500
 
     elif request.method == 'POST':
-        # Handle POST request for booking appointment
         try:
-            # Get appointment data from request
             data = request.get_json()
 
-            # Extract doctor and patient details from the form data
             doctor_id = data.get('doctorId')
-            patient_id = data.get('patientId')  # Now patient_id comes from frontend
+            patient_id = data.get('patientId')
             doctor_name = data.get('doctorName')
             patient_name = data.get('name')
             patient_email = data.get('email')
@@ -54,29 +50,47 @@ def booking_form(current_user):
                 return jsonify({"error": "Missing required fields"}), 400
 
             conn = get_db_connection()
-            cursor = conn.cursor()
+            cursor = conn.cursor(dictionary=True)
 
-            # Insert appointment details into the database
+            # ✅ Check if the slot is available and not booked
+            cursor.execute("""
+                SELECT is_available, is_booked FROM doctor_availability
+                WHERE doctor_id = %s AND date = %s AND start_time = %s
+            """, (doctor_id, appointment_date, appointment_time))
+            slot = cursor.fetchone()
+
+            if not slot or slot['is_available'] != 'Y' or slot['is_booked'] == 'Y':
+                cursor.close()
+                conn.close()
+                return jsonify({"error": "Selected slot is not available"}), 409
+
+            # ✅ Book the appointment
             insert_query = """
-                INSERT INTO appointments (patient_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone, 
+                INSERT INTO appointments (patient_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone,
                                           appointment_date, appointment_time, notes)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_query, (patient_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone, 
+            cursor.execute(insert_query, (patient_id, doctor_id, doctor_name, patient_name, patient_email, patient_phone,
                                           appointment_date, appointment_time, notes))
+            appointment_id = cursor.lastrowid
 
-            appointment_id = cursor.lastrowid  # Get the last inserted appointment ID
-
-            # ✅ Insert into `patient_doctor_records`
-            insert_record_query = """
+            # ✅ Insert into patient_doctor_records
+            cursor.execute("""
                 INSERT INTO patient_doctor_records (appointment_id, patient_id, doctor_id, doctor_notes, patient_notes)
                 VALUES (%s, %s, %s, '', '')
-            """
-            cursor.execute(insert_record_query, (appointment_id, patient_id, doctor_id))
+            """, (appointment_id, patient_id, doctor_id))
+
+            # ✅ Mark the time slot as booked
+            cursor.execute("""
+                UPDATE doctor_availability SET is_booked = 'Y'
+                WHERE doctor_id = %s AND date = %s AND start_time = %s
+            """, (doctor_id, appointment_date, appointment_time))
 
             conn.commit()
             cursor.close()
             conn.close()
+
             return jsonify({"success": True, "message": "Appointment booked successfully!"}), 200
+
         except mysql.connector.Error as err:
             return jsonify({"success": False, "error": str(err)}), 500
