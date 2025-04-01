@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const notificationIcon = document.querySelector(".notification-icon");
 
     function fetchNotifications() {
+        const loader = document.getElementById("loader");
+        loader.style.display = "block";  // Show loader
+    
         fetch("/api/notifications", {
             method: "GET",
             headers: { 
@@ -14,19 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             notificationsList.innerHTML = "";
-
+    
             if (data.error) {
                 notificationsList.innerHTML = `<li class="no-notifications">${data.error}</li>`;
                 updateBadgeCount(0);
                 return;
             }
-
+    
             if (data.length === 0) {
                 notificationsList.innerHTML = '<li class="no-notifications">No new notifications.</li>';
                 updateBadgeCount(0);
                 return;
             }
-
+    
             data.forEach(notification => {
                 const li = document.createElement("li");
                 li.className = "notification-item";
@@ -36,11 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
                 notificationsList.appendChild(li);
             });
-
+    
             updateBadgeCount(data.length);
         })
-        .catch(error => console.error("❌ DEBUG: Error fetching notifications:", error));
+        .catch(error => console.error("❌ DEBUG: Error fetching notifications:", error))
+        .finally(() => {
+            loader.style.display = "none";  // Hide loader no matter what
+        });
     }
+    
 
     notificationsList.addEventListener("click", (event) => {
         if (event.target.classList.contains("mark-read")) {

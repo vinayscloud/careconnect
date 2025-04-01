@@ -52,7 +52,6 @@
 <body>
 
   <!-- Navbar -->
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top" id="mainNavbar">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
@@ -312,6 +311,14 @@
 
     document.getElementById("updateForm").addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      const fullName = document.getElementById("full_name").value.trim();
+      const nameParts = fullName.split(/\s+/);
+      if (nameParts.length < 2) {
+        document.getElementById("msg").innerText = "❌ Please enter both first and last name.";
+        return;
+      }
+
       const formData = new FormData(this);
       const jsonData = {};
       formData.forEach((value, key) => jsonData[key] = value);

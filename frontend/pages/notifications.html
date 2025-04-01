@@ -38,6 +38,28 @@
       color: #ffe082 !important;
       /* light amber highlight */
     }
+
+
+
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
   </style>
 </head>
 
@@ -90,24 +112,27 @@
     </div>
   </nav>
 
+
+
   <!-- <div class="navbar">
-      <div class="brand">
-          <a class="nav-app-name" href="{{ url_for('index') }}">CareConnect</a>
-      </div>
-      <div class="notifications">
-          <span class="notification-icon">🔔</span>
-          <span class="notification-badge" style="display: none;">0</span>
-      </div>
+    <div class="brand">
+      <a class="nav-app-name" href="{{ url_for('index') }}">CareConnect</a>
+    </div>
+    <div class="notifications">
+      <span class="notification-icon">🔔</span>
+      <span class="notification-badge" style="display: none;">0</span>
+    </div>
   </div> -->
 
   <!-- <div class="notifications">
-        <span class="icon">🔔</span>
-        <span class="badge">0</span>
-      </div> -->
+    <span class="icon">🔔</span>
+    <span class="badge">0</span>
+  </div> -->
 
   <div class="notifications-panel" id="notifications-panel">
     <h1>Notifications</h1>
     <ul id="notifications-list">
+      <div id="loader" class="loader" style="display: none;"></div>
       <!-- Notifications will be dynamically added here -->
     </ul>
   </div>

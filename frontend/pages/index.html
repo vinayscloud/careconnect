@@ -13,6 +13,7 @@
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
         }
+
         .hero {
             position: relative;
             background: url('{{ url_for("static", filename="images/family-doctor.JPG") }}') no-repeat center center;
@@ -131,6 +132,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ url_for('load_page', page_name='doctor-profile') }}">
+                            <i class="fa-solid fa-user-doctor mr-2"></i>Doctors
+                        </a>
+                    </li>
+                    {% if session['token'] %}
+                    <li class="nav-item">
                         <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
                             <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
                         </a>
@@ -142,13 +150,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center"
-                            href="{{ url_for('load_page', page_name='doctor-profile') }}">
-                            <i class="fas fa-user-edit mr-2"></i> Doctors
-                        </a>
-                    </li>
-                    {% if session['token'] %}
-                    <li class="nav-item">
                         <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
                             onclick="return confirmLogout();">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
@@ -158,7 +159,7 @@
                     <li class="nav-item">
                         <a class="nav-link d-flex align-items-center"
                             href="{{ url_for('load_page', page_name='login') }}">
-                            <i class="fas fa-sign-in-alt mr-2"></i> Login
+                            <i class="fa-solid fa-user mr-2"></i>Login
                         </a>
                     </li>
                     {% endif %}
@@ -175,6 +176,36 @@
             <a href="{{ url_for('load_page', page_name='learn-more') }}">Learn More</a>
         </div>
     </section>
+
+    <!-- About Application (Jumbotron-like Section) -->
+    <section class="bg-white text-dark py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <img src="{{ url_for('static', filename='images/healthcare-connected.jpg') }}"
+                        alt="Healthcare System" class="img-fluid rounded shadow">
+                </div>
+                <div class="col-md-6">
+                    <h2 class="mb-3 text-primary">Empowering Healthcare in Ontario</h2>
+                    <p class="lead">CareConnect simplifies the process of finding and connecting with family doctors in
+                        Ontario. We make sure patients get timely and coordinated care—right when they need it.</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Easy appointment booking with
+                            trusted doctors</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Real-time updates and
+                            appointment reminders</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Personalized patient
+                            dashboards and notifications</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Safe and secure information
+                            handling</li>
+                    </ul>
+                    <a href="{{ url_for('load_page', page_name='doctor-profile') }}" class="btn btn-primary mt-3">Find a
+                        Family Doctor</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 
     <!-- Features Section -->
@@ -214,38 +245,14 @@
     </div>
 
     <!-- Testimonials Section -->
-    <section class="container my-5">
-        <h2 class="text-center text-primary mb-4">What Our Users Say</h2>
-        <div id="testimonialCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
-            data-bs-interval="5000">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <div class="testimonial">
-                        <img src="{{ url_for('static', filename='images/user1.png') }}" alt="User 1"
-                            class="testimonial-img">
-                        <h4>Sarah Thompson</h4>
-                        <p class="testimonial-text">"CareConnect has made booking doctor appointments so easy!"</p>
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="testimonial">
-                        <img src="{{ url_for('static', filename='images/user2.jpg') }}" alt="User 2"
-                            class="testimonial-img">
-                        <h4>Michael Lee</h4>
-                        <p class="testimonial-text">"The notification system is a lifesaver!"</p>
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Carousel Controls (Next & Previous Buttons) -->
-            <!-- <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </button> -->
+    <section class="bg-white py-5">
+        <div class="container">
+            <h2 class="text-center text-primary mb-5">Trusted by Patients Across Ontario</h2>
+            <div id="testimonialRow" class="row justify-content-center row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"
+                data-img-path="{{ url_for('static', filename='images') }}">
+                <!-- Testimonials will be injected here -->
+            </div>
         </div>
     </section>
 
@@ -259,6 +266,40 @@
 
     <script src="{{ url_for('static', filename='scripts/jquery-3.5.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        const testimonials = [
+            { name: "Sarah Thompson", text: "CareConnect helped me book my first family doctor in minutes.", image: "user1.png" },
+            { name: "Michael Lee", text: "I receive updates and reminders right when I need them.", image: "user2.jpg" },
+            { name: "Anjali Singh", text: "As a newcomer to Canada, CareConnect made finding care feel welcoming.", image: "user2.jpg" },
+            { name: "Daniel Chen", text: "Simple, fast, and the UI is clean. Everything I need.", image: "user1.png" },
+            { name: "Laura Martin", text: "One of the best platforms I’ve used for booking.", image: "user2.jpg" },
+        ];
+
+        function renderTestimonials() {
+            const container = document.getElementById("testimonialRow");
+            const imagePath = container.getAttribute("data-img-path");
+
+            testimonials.forEach((t) => {
+                const col = document.createElement("div");
+                col.className = "col d-flex pb-4";
+
+                col.innerHTML = `
+        <div class="card w-100 h-100 border-0 shadow-sm rounded-4 p-3 text-center">
+        <img src="${imagePath}/${t.image}" class="rounded-circle mx-auto mb-3"
+             alt="${t.name}" style="width: 70px; height: 70px;">
+        <h5 class="fw-bold mb-1">${t.name}</h5>
+        <div class="text-warning mb-2">⭐⭐⭐⭐⭐</div>
+        <p class="text-muted small">"${t.text}"</p>
+        </div>
+        `;
+
+                container.appendChild(col);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", renderTestimonials);
+
+    </script>
 </body>
 
 </html>
