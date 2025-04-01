@@ -6,12 +6,12 @@ from datetime import time, timedelta
 # Define Blueprint
 doctor_availability_bp = Blueprint('doctor_availability_bp', __name__)
 
-# ✅ 1. GET availability for a specific doctor and date
+# ✅ 1. GET availability for a specific doctor and date (used by frontend)
 @doctor_availability_bp.route('/get', methods=['GET'])
 @token_required
-def get_availability(current_user):
-    doctor_id = current_user['id']
-    date = request.args.get('date')
+def get_availability_by_date(current_user):
+    doctor_id = current_user["id"]
+    date = request.args.get("date")
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -24,7 +24,7 @@ def get_availability(current_user):
 
     data = cursor.fetchall()
 
-    # ✅ Robustly format start_time
+    # Format start_time
     for item in data:
         start = item.get("start_time")
         if isinstance(start, time):
@@ -40,7 +40,6 @@ def get_availability(current_user):
     cursor.close()
     conn.close()
     return jsonify(data)
-
 
 # ✅ 2. POST - Doctor updates availability
 @doctor_availability_bp.route('/update_availability', methods=['POST'])
@@ -68,8 +67,7 @@ def update_availability(current_user):
     conn.close()
     return jsonify({"message": "Availability updated successfully!"})
 
-
-# ✅ 3. GET available slots (for patient side)
+# ✅ 3. GET available slots (used by patients)
 @doctor_availability_bp.route('/slots', methods=['GET'])
 def get_slots_for_booking():
     doctor_id = request.args.get('doctor_id')
@@ -85,7 +83,6 @@ def get_slots_for_booking():
 
     slots = cursor.fetchall()
 
-    # ✅ Format time for frontend dropdown
     for item in slots:
         start = item.get("start_time")
         if isinstance(start, time):
@@ -101,3 +98,37 @@ def get_slots_for_booking():
     cursor.close()
     conn.close()
     return jsonify(slots)
+
+# ✅ 4. GET all availability (for displaying below table)
+@doctor_availability_bp.route('/all', methods=['GET'])
+@token_required
+def get_all_availability(current_user):
+    doctor_id = current_user["id"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT availability_date, start_time, is_available, is_booked 
+        FROM doctor_availability
+        WHERE doctor_id = %s and availability_date >= current_date()
+        ORDER BY availability_date, start_time
+    """, (doctor_id,))
+
+    data = cursor.fetchall()
+
+    for item in data:
+        start = item.get("start_time")
+        if isinstance(start, time):
+            item["start_time"] = start.strftime("%H:%M")
+        elif isinstance(start, timedelta):
+            total_minutes = int(start.total_seconds() // 60)
+            hours = total_minutes // 60
+            minutes = total_minutes % 60
+            item["start_time"] = f"{hours:02d}:{minutes:02d}"
+        else:
+            item["start_time"] = str(start)
+
+    cursor.close()
+    conn.close()
+    return jsonify(data)

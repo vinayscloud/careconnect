@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <title>Doctor Availability | CareConnect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Bootstrap & Icons -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/fontawesome.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
-
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
       background-color: #f4f8fb;
       font-family: "Segoe UI", sans-serif;
     }
-
+  
+    .navbar {
+      background-color: #007bff;
+    }
+  
+    .navbar-brand,
+    .nav-link {
+      color: #fff !important;
+    }
+  
+    .navbar-nav .nav-link:hover {
+      color: #ffe082 !important;
+    }
+  
     .availability-container {
       max-width: 900px;
       margin: 40px auto;
@@ -25,7 +33,7 @@
       border-radius: 12px;
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
     }
-
+  
     .slot {
       display: inline-block;
       width: 100px;
@@ -39,33 +47,54 @@
       cursor: pointer;
       transition: 0.2s;
     }
-
+  
     .available {
       background-color: #198754;
       color: #fff;
     }
-
+  
     .booked {
-      background-color: #dc3545;
+      background-color: #6c757d;
       color: #fff;
       cursor: not-allowed;
     }
-
+  
     .not-available {
-      background-color: #adb5bd;
+      background-color: #dc3545;
       color: #fff;
     }
-
+  
     .submit-btn {
       margin-top: 20px;
       background-color: #007bff;
       color: #fff;
     }
-
+  
     .submit-btn:hover {
       background-color: #0062cc;
     }
+  
+    .table-responsive {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  
+    .status-available {
+      color: #198754;
+      font-weight: bold;
+    }
+  
+    .status-not-available {
+      color: #dc3545;
+      font-weight: bold;
+    }
+  
+    .status-booked {
+      color: #6c757d;
+      font-weight: bold;
+    }
   </style>
+  
 </head>
 
 <body>
@@ -75,86 +104,78 @@
       <a class="navbar-brand d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
         <i class="fas fa-heartbeat mr-2"></i> <strong>CareConnect</strong>
       </a>
-
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.dashboard') }}"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('load_page', page_name='notifications') }}"><i class="fas fa-bell mr-2"></i> Notifications</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('load_page', page_name='doctor_update_profile') }}"><i class="fas fa-user-edit mr-2"></i> Profile</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.dashboard') }}"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='notifications') }}"><i class="fas fa-bell mr-2"></i> Notifications</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor_update_profile') }}"><i class="fas fa-user-edit mr-2"></i> Profile</a></li>
           {% if session['token'] %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirm('Logout?');">
-              <i class="fas fa-sign-out-alt mr-2"></i> Logout
-            </a>
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('load_page', page_name='login') }}">
-              <i class="fas fa-sign-in-alt mr-2"></i> Login
-            </a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirm('Logout?');"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a></li>
           {% endif %}
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Availability Section -->
+  <!-- Availability Management -->
   <div class="availability-container">
     <h3 class="text-center mb-4">🗓️ Manage My Availability</h3>
-
     <div class="mb-4 text-center">
       <label for="availability-date" class="form-label fw-semibold">Select Date:</label>
       <input type="date" id="availability-date" class="form-control d-inline-block w-auto">
     </div>
-
     <div id="time-slots" class="text-center"></div>
-
     <div class="text-center">
       <button class="btn submit-btn" onclick="submitAvailability()">Update Availability</button>
     </div>
+
+    <!-- Availability Table Section -->
+    <div class="mt-5">
+      <h5 class="text-center">My Set Availability</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center mt-3">
+          <thead class="thead-dark">
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="availability-table-body">
+            <tr><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <!-- JS -->
+  <!-- JavaScript -->
   <script>
     const times = [
       "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
       "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
       "15:00", "15:30", "16:00", "16:30"
     ];
-  
+
     document.addEventListener("DOMContentLoaded", () => {
-      const dateInput = document.getElementById("availability-date");
       const today = new Date().toISOString().split("T")[0];
-      dateInput.min = today;
+      const dateInput = document.getElementById("availability-date");
       dateInput.value = today;
-  
       fetchAvailability();
+      loadAvailabilityTable();
     });
-  
+
     document.getElementById('availability-date').addEventListener('change', fetchAvailability);
-  
+
     function fetchAvailability() {
       const date = document.getElementById('availability-date').value;
       fetch(`/doctor-availability/get?date=${date}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
       })
-        .then(res => {
-          if (!res.ok) throw new Error("Failed to load availability");
-          return res.json();
-        })
+        .then(res => res.json())
         .then(data => {
           const container = document.getElementById('time-slots');
           container.innerHTML = '';
@@ -163,7 +184,7 @@
             slot.classList.add('slot');
             slot.dataset.time = time;
             slot.textContent = time;
-  
+
             const slotData = data.find(s => s.start_time === time);
             if (slotData) {
               if (slotData.is_booked === 'Y') slot.classList.add('booked');
@@ -172,23 +193,19 @@
             } else {
               slot.classList.add('not-available');
             }
-  
+
             slot.onclick = () => {
               if (!slot.classList.contains('booked')) {
                 slot.classList.toggle('available');
                 slot.classList.toggle('not-available');
               }
             };
-  
+
             container.appendChild(slot);
           });
-        })
-        .catch(err => {
-          console.error(err);
-          alert("❌ Failed to load availability.");
         });
     }
-  
+
     function submitAvailability() {
       const date = document.getElementById('availability-date').value;
       const slots = document.querySelectorAll('.slot');
@@ -196,25 +213,66 @@
         time: slot.dataset.time,
         status: slot.classList.contains('available') ? 'Y' : 'N'
       }));
-  
+
       fetch('/doctor-availability/update_availability', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({ date, availability: availabilityData })
       })
         .then(res => res.json())
-        .then(data => alert(data.message))
-        .catch(err => {
-          console.error(err);
-          alert("❌ Failed to update availability.");
+        .then(data => {
+          alert(data.message);
+          loadAvailabilityTable(); // ✅ Refresh table after update
         });
     }
-  </script>
-  
-  
-</body>
 
+    function loadAvailabilityTable() {
+  fetch("/doctor-availability/all", {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("availability-table-body");
+      tbody.innerHTML = "";
+      if (data.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='3'>No availability set yet.</td></tr>";
+      } else {
+        data.forEach(slot => {
+          const row = document.createElement("tr");
+
+          let statusClass = "";
+          let statusLabel = "";
+
+          if (slot.is_booked === "Y") {
+            statusClass = "status-booked";
+            statusLabel = "Booked";
+          } else if (slot.is_available === "Y") {
+            statusClass = "status-available";
+            statusLabel = "Available";
+          } else {
+            statusClass = "status-not-available";
+            statusLabel = "Not Available";
+          }
+
+          row.innerHTML = `
+            <td>${slot.availability_date}</td>
+            <td>${slot.start_time}</td>
+            <td class="${statusClass}">${statusLabel}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    })
+    .catch(err => {
+      console.error("❌ Failed to load availability table", err);
+    });
+}
+
+  </script>
+</body>
 </html>
