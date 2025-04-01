@@ -92,8 +92,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
-              onclick="return confirmLogout();">
+            <a class="nav-link d-flex align-items-center" href="#" data-toggle="modal" data-target="#logoutModal">
               <i class="fas fa-sign-out-alt mr-2"></i> Logout
             </a>
           </li>
@@ -110,76 +109,82 @@
   </nav>
 
   <body>
- <!-- HERO SECTION -->
-<section class="hero-section text-white text-center">
-  <div class="container">
-    <h1 class="display-4">Connecting Canadians to Family Doctors</h1>
-    <p class="lead">CareConnect helps you find, book, and manage appointments with licensed family doctors across Ontario.</p>
-  </div>
-</section>
+    <!-- HERO SECTION -->
+    <section class="hero-section text-white text-center">
+      <div class="container">
+        <h1 class="display-4">Connecting Canadians to Family Doctors</h1>
+        <p class="lead">CareConnect helps you find, book, and manage appointments with licensed family doctors across
+          Ontario.</p>
+      </div>
+    </section>
 
-<!-- ABOUT US -->
-<section class="container about-us my-5">
-  <div class="row">
-    <div class="col-md-6">
-      <img src="{{ url_for('static', filename='images/learnmore.jpg') }}" alt="Healthcare Support Team"
-        class="img-fluid rounded shadow">
-    </div>
-    <div class="col-md-6">
-      <h2>What is CareConnect?</h2>
-      <p>CareConnect is a digital healthcare platform designed to help Canadians easily connect with available family doctors. We aim to simplify the healthcare journey by offering search tools, appointment booking, and personalized medical profiles.</p>
-      <p>Whether you're a patient looking for a family doctor or a physician managing appointments, CareConnect brings everyone together in one centralized, secure, and user-friendly system.</p>
-    </div>
-  </div>
-</section>
+    <!-- ABOUT US -->
+    <section class="container about-us my-5">
+      <div class="row">
+        <div class="col-md-6">
+          <img src="{{ url_for('static', filename='images/learnmore.jpg') }}" alt="Healthcare Support Team"
+            class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-6">
+          <h2>What is CareConnect?</h2>
+          <p>CareConnect is a digital healthcare platform designed to help Canadians easily connect with available
+            family doctors. We aim to simplify the healthcare journey by offering search tools, appointment booking, and
+            personalized medical profiles.</p>
+          <p>Whether you're a patient looking for a family doctor or a physician managing appointments, CareConnect
+            brings everyone together in one centralized, secure, and user-friendly system.</p>
+        </div>
+      </div>
+    </section>
 
-<!-- OUR WORK -->
-<section class="container my-5">
-  <h2 class="text-center">What You Can Do with CareConnect</h2>
-  <div class="row">
-    <div class="col-md-6">
-      <ul class="list-group">
-        <li class="list-group-item">✔ Search for family doctors by name, location, or specialty</li>
-        <li class="list-group-item">✔ Book appointments based on real-time availability</li>
-        <li class="list-group-item">✔ Secure login and registration with role-based access</li>
-        <li class="list-group-item">✔ Get notified about upcoming appointments</li>
-      </ul>
-    </div>
-    <div class="col-md-6">
-      <ul class="list-group">
-        <li class="list-group-item">✔ Manage patient and doctor profiles</li>
-        <li class="list-group-item">✔ Receive email confirmations and reminders</li>
-        <li class="list-group-item">✔ View appointment history and cancel when needed</li>
-        <li class="list-group-item">✔ Built with secure, scalable cloud technologies</li>
-      </ul>
-    </div>
-  </div>
-</section>
+    <!-- OUR WORK -->
+    <section class="container my-5">
+      <h2 class="text-center">What You Can Do with CareConnect</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <ul class="list-group">
+            <li class="list-group-item">✔ Search for family doctors by name, location, or specialty</li>
+            <li class="list-group-item">✔ Book appointments based on real-time availability</li>
+            <li class="list-group-item">✔ Secure login and registration with role-based access</li>
+            <li class="list-group-item">✔ Get notified about upcoming appointments</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <ul class="list-group">
+            <li class="list-group-item">✔ Manage patient and doctor profiles</li>
+            <li class="list-group-item">✔ Receive email confirmations and reminders</li>
+            <li class="list-group-item">✔ View appointment history and cancel when needed</li>
+            <li class="list-group-item">✔ Built with secure, scalable cloud technologies</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-<!-- EQUITY & HEALTH -->
-<section class="container text-center my-5">
-  <h2>Our Commitment to All Ontarians</h2>
-  <p>We’re building a platform that is inclusive, secure, and accessible for every individual—regardless of background, ability, or location. We aim to support the health of all communities through equitable access to care.</p>
-</section>
+    <!-- EQUITY & HEALTH -->
+    <section class="container text-center my-5">
+      <h2>Our Commitment to All Ontarians</h2>
+      <p>We’re building a platform that is inclusive, secure, and accessible for every individual—regardless of
+        background, ability, or location. We aim to support the health of all communities through equitable access to
+        care.</p>
+    </section>
 
-<!-- OUR VALUES -->
-<section class="container my-5">
-  <h2 class="text-center">Our Vision, Mission & Values</h2>
-  <div class="row text-center">
-    <div class="col-md-4">
-      <h4>🌟 Vision</h4>
-      <p>Everyone in Canada deserves a connected healthcare experience.</p>
-    </div>
-    <div class="col-md-4">
-      <h4>🚀 Mission</h4>
-      <p>To bridge the gap between patients and doctors through technology and compassionate care.</p>
-    </div>
-    <div class="col-md-4">
-      <h4>💙 Values</h4>
-      <p>Accessibility, Trust, Innovation, Simplicity, and Respect.</p>
-    </div>
-  </div>
-</section>
+    <!-- OUR VALUES -->
+    <section class="container my-5">
+      <h2 class="text-center">Our Vision, Mission & Values</h2>
+      <div class="row text-center">
+        <div class="col-md-4">
+          <h4>🌟 Vision</h4>
+          <p>Everyone in Canada deserves a connected healthcare experience.</p>
+        </div>
+        <div class="col-md-4">
+          <h4>🚀 Mission</h4>
+          <p>To bridge the gap between patients and doctors through technology and compassionate care.</p>
+        </div>
+        <div class="col-md-4">
+          <h4>💙 Values</h4>
+          <p>Accessibility, Trust, Innovation, Simplicity, and Respect.</p>
+        </div>
+      </div>
+    </section>
 
 
     <!-- Footer -->
@@ -191,6 +196,28 @@
         <a href="#" class="text-white mx-2">Privacy</a>
       </div>
     </footer>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to logout?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="{{ url_for('static', filename='scripts/jquery-3.5.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>

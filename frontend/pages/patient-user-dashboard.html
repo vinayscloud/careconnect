@@ -89,8 +89,7 @@
           </li>
           {% if session['token'] %}
           <li class="nav-item">
-            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
-              onclick="return confirmLogout();">
+            <a class="nav-link d-flex align-items-center" href="#" data-toggle="modal" data-target="#logoutModal">
               <i class="fas fa-sign-out-alt mr-2"></i> Logout
             </a>
           </li>
@@ -147,6 +146,28 @@
           <h5 class="card-title">Manage Records</h5>
           <p class="card-text">Access and manage your medical records and history.</p>
           <a href="{{ url_for('load_page', page_name='patient_records') }}" class="btn btn-primary">View Records</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to logout?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
         </div>
       </div>
     </div>

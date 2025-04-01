@@ -1,30 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Doctor Availability | CareConnect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/fontawesome.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
   <style>
     body {
       background-color: #f4f8fb;
       font-family: "Segoe UI", sans-serif;
     }
-  
-    .navbar {
-      background-color: #007bff;
-    }
-  
-    .navbar-brand,
-    .nav-link {
-      color: #fff !important;
-    }
-  
-    .navbar-nav .nav-link:hover {
-      color: #ffe082 !important;
-    }
-  
+
     .availability-container {
       max-width: 900px;
       margin: 40px auto;
@@ -33,7 +22,7 @@
       border-radius: 12px;
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
     }
-  
+
     .slot {
       display: inline-block;
       width: 100px;
@@ -47,73 +36,100 @@
       cursor: pointer;
       transition: 0.2s;
     }
-  
+
     .available {
       background-color: #198754;
       color: #fff;
     }
-  
+
     .booked {
       background-color: #6c757d;
       color: #fff;
       cursor: not-allowed;
     }
-  
+
     .not-available {
       background-color: #dc3545;
       color: #fff;
     }
-  
+
     .submit-btn {
       margin-top: 20px;
       background-color: #007bff;
       color: #fff;
     }
-  
+
     .submit-btn:hover {
       background-color: #0062cc;
     }
-  
+
     .table-responsive {
       max-height: 300px;
       overflow-y: auto;
     }
-  
+
     .status-available {
       color: #198754;
       font-weight: bold;
     }
-  
+
     .status-not-available {
       color: #dc3545;
       font-weight: bold;
     }
-  
+
     .status-booked {
       color: #6c757d;
       font-weight: bold;
     }
   </style>
-  
+
 </head>
 
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
         <i class="fas fa-heartbeat mr-2"></i> <strong>CareConnect</strong>
       </a>
+
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.dashboard') }}"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='notifications') }}"><i class="fas fa-bell mr-2"></i> Notifications</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('load_page', page_name='doctor_update_profile') }}"><i class="fas fa-user-edit mr-2"></i> Profile</a></li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+              <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='notifications') }}">
+              <i class="fas fa-bell mr-2"></i> Notifications
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center"
+              href="{{ url_for('load_page', page_name='doctor_update_profile') }}">
+              <i class="fas fa-user-edit mr-2"></i> Profile
+            </a>
+          </li>
           {% if session['token'] %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}" onclick="return confirm('Logout?');"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a></li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
+              onclick="return confirmLogout();">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="{{ url_for('load_page', page_name='login') }}">
+              <i class="fas fa-sign-in-alt mr-2"></i> Login
+            </a>
+          </li>
           {% endif %}
         </ul>
       </div>
@@ -145,7 +161,9 @@
             </tr>
           </thead>
           <tbody id="availability-table-body">
-            <tr><td colspan="3">Loading...</td></tr>
+            <tr>
+              <td colspan="3">Loading...</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -230,49 +248,53 @@
     }
 
     function loadAvailabilityTable() {
-  fetch("/doctor-availability/all", {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem("token")}`
-    }
-  })
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.getElementById("availability-table-body");
-      tbody.innerHTML = "";
-      if (data.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='3'>No availability set yet.</td></tr>";
-      } else {
-        data.forEach(slot => {
-          const row = document.createElement("tr");
-
-          let statusClass = "";
-          let statusLabel = "";
-
-          if (slot.is_booked === "Y") {
-            statusClass = "status-booked";
-            statusLabel = "Booked";
-          } else if (slot.is_available === "Y") {
-            statusClass = "status-available";
-            statusLabel = "Available";
+      fetch("/doctor-availability/all", {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("availability-table-body");
+          tbody.innerHTML = "";
+          if (data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='3'>No availability set yet.</td></tr>";
           } else {
-            statusClass = "status-not-available";
-            statusLabel = "Not Available";
-          }
+            data.forEach(slot => {
+              const row = document.createElement("tr");
 
-          row.innerHTML = `
+              let statusClass = "";
+              let statusLabel = "";
+
+              if (slot.is_booked === "Y") {
+                statusClass = "status-booked";
+                statusLabel = "Booked";
+              } else if (slot.is_available === "Y") {
+                statusClass = "status-available";
+                statusLabel = "Available";
+              } else {
+                statusClass = "status-not-available";
+                statusLabel = "Not Available";
+              }
+
+              row.innerHTML = `
             <td>${slot.availability_date}</td>
             <td>${slot.start_time}</td>
             <td class="${statusClass}">${statusLabel}</td>
           `;
-          tbody.appendChild(row);
+              tbody.appendChild(row);
+            });
+          }
+        })
+        .catch(err => {
+          console.error("❌ Failed to load availability table", err);
         });
-      }
-    })
-    .catch(err => {
-      console.error("❌ Failed to load availability table", err);
-    });
-}
+    }
 
+    function confirmLogout() {
+      return confirm("Are you sure you want to logout?");
+    }
   </script>
 </body>
+
 </html>

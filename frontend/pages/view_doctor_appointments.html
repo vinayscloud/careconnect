@@ -82,8 +82,8 @@
                     </li>
                     {% if session['token'] %}
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}"
-                            onclick="return confirmLogout();">
+                        <a class="nav-link d-flex align-items-center" href="#" data-toggle="modal"
+                            data-target="#logoutModal">
                             <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </a>
                     </li>
@@ -154,6 +154,28 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -254,9 +276,6 @@
             document.getElementById("upcoming-appointments").textContent = appointments.filter(a => new Date(a.appointment_date) > new Date()).length;
         }
 
-        function confirmLogout() {
-            return confirm("Are you sure you want to logout?");
-        }
     </script>
 
 
