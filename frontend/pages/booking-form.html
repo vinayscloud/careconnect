@@ -241,13 +241,18 @@
     });
 
     // Preload time slots for today
+    // Allow booking for any future date
     document.addEventListener("DOMContentLoaded", () => {
-      const dateInput = document.getElementById("date");
-      const today = new Date().toISOString().split("T")[0];
-      dateInput.min = today;
-      dateInput.value = today;
-      loadTimeSlots(today);
+    const dateInput = document.getElementById("date");
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.min = today;
+
+    dateInput.addEventListener("change", (e) => {
+    const date = e.target.value;
+    if (date) loadTimeSlots(date);
     });
+    });
+
   </script>
 </body>
 

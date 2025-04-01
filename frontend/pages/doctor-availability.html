@@ -135,15 +135,9 @@
   
     document.addEventListener("DOMContentLoaded", () => {
       const dateInput = document.getElementById("availability-date");
-      const today = new Date();
-      const minDate = today.toISOString().split("T")[0];
-      const maxDate = new Date(today);
-      maxDate.setDate(today.getDate() + 15);
-      const maxDateFormatted = maxDate.toISOString().split("T")[0];
-  
-      dateInput.min = minDate;
-      dateInput.max = maxDateFormatted;
-      dateInput.value = minDate;
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.min = today;
+      dateInput.value = today;
   
       fetchAvailability();
     });
@@ -219,6 +213,7 @@
         });
     }
   </script>
+  
   
 </body>
 
