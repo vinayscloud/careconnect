@@ -1,5 +1,5 @@
 .navbar {
-  background-color: #007bff;
+  background-color: #265282 !important;
   color: #fff;
 }
 
@@ -39,4 +39,14 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.btn {
+  background-color: #265282 !important;
+  color: #fff !important;
+}
+
+.modal-header {
+  background-color: #265282 !important;
+  color: #fff !important;
 }

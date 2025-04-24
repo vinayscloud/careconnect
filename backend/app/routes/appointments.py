@@ -55,7 +55,7 @@ def booking_form(current_user):
             # ✅ Check if the slot is available and not booked
             cursor.execute("""
                 SELECT is_available, is_booked FROM doctor_availability
-                WHERE doctor_id = %s AND date = %s AND start_time = %s
+                WHERE doctor_id = %s AND availability_date = %s AND start_time = %s
             """, (doctor_id, appointment_date, appointment_time))
             slot = cursor.fetchone()
 
@@ -83,7 +83,7 @@ def booking_form(current_user):
             # ✅ Mark the time slot as booked
             cursor.execute("""
                 UPDATE doctor_availability SET is_booked = 'Y'
-                WHERE doctor_id = %s AND date = %s AND start_time = %s
+                WHERE doctor_id = %s AND availability_date = %s AND start_time = %s
             """, (doctor_id, appointment_date, appointment_time))
 
             conn.commit()

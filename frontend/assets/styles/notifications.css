@@ -93,7 +93,7 @@ body {
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 2rem;
-  color: #007bff;
+  color: #265282;
 }
 
 /* 📝 Notification Item Styling */
@@ -142,4 +142,14 @@ body {
   color: #555;
   margin-top: 1rem;
   font-style: italic;
+}
+
+.btn {
+  background-color: #265282 !important;
+  color: #fff !important;
+}
+
+.modal-header {
+  background-color: #265282 !important;
+  color: #fff !important;
 }

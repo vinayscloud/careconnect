@@ -22,6 +22,13 @@
       transform: scale(1.05);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
+
+    .card-img-left {
+      object-fit: cover;
+      height: 100%;
+      border-top-left-radius: calc(0.25rem - 1px);
+      border-bottom-left-radius: calc(0.25rem - 1px);
+    }
   </style>
 </head>
 
@@ -93,10 +100,16 @@
       </div>
       <div class="col-md-3 mb-3">
         <select id="cityFilter" class="form-control">
-          <option value="">All Cities</option>
-          <option value="New York">New York</option>
-          <option value="Los Angeles">Los Angeles</option>
-          <option value="Chicago">Chicago</option>
+          <option value="Toronto">Toronto</option>
+          <option value="Vancouver">Vancouver</option>
+          <option value="Montreal">Montreal</option>
+          <option value="Calgary">Calgary</option>
+          <option value="Ottawa">Ottawa</option>
+          <option value="Edmonton">Edmonton</option>
+          <option value="Winnipeg">Winnipeg</option>
+          <option value="Halifax">Halifax</option>
+          <option value="Quebec City">Quebec City</option>
+          <option value="Mississauga">Mississauga</option>
         </select>
       </div>
       <div class="col-md-3 mb-3">
@@ -187,17 +200,12 @@
       const profilesContainer = document.getElementById('doctorProfiles');
       profilesContainer.innerHTML = doctors.length ? '' : '<p>No doctors found.</p>';
 
-      let row = null;
-
-      doctors.forEach((doctor, index) => {
-        if (index % 4 === 0) {
-          row = document.createElement('div');
-          row.className = 'row mb-4';
-          profilesContainer.appendChild(row);
-        }
+      doctors.forEach((doctor) => {
+        const doctorRow = document.createElement('div');
+        doctorRow.className = 'row mb-4';
 
         const doctorCard = document.createElement('div');
-        doctorCard.className = 'col-md-3 mb-4';
+        doctorCard.className = 'col-md-12'; // full width for list view
         doctorCard.innerHTML = `
             <div class="card h-100 card-hover">
               <img src="/assets/${doctor.photo_url || 'images/default_doctor.jpg'}" class="card-img-top" alt="${doctor.name}">
@@ -214,8 +222,10 @@
 
         row.appendChild(doctorCard);
       });
+
       hideLoader();
     }
+
 
     document.getElementById('searchButton').addEventListener('click', fetchDoctors);
     fetchDoctors();

@@ -46,6 +46,10 @@
       color: #d2ff3f !important;
       /* light amber highlight */
     }
+
+    .modal-header{
+      background-color: #265282;
+    }
   </style>
 </head>
 
@@ -223,7 +227,7 @@
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header text-white">
           <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -239,6 +243,28 @@
       </div>
     </div>
   </div>
+
+  <!-- Success Confirmation Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header text-white">
+          <!-- <h5 class="modal-title" id="successModalLabel">Success</h5> -->
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="successModalBody">
+          Your profile has been updated successfully.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <script src="{{ url_for('static', filename='scripts/jquery-3.5.1.slim.min.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/bootstrap.bundle.min.js') }}"></script>
@@ -355,7 +381,9 @@
       });
 
       const result = await res.json();
-      document.getElementById("msg").innerText = result.message;
+      document.getElementById("successModalBody").innerText = result.message || "Profile updated successfully.";
+      $('#successModal').modal('show');
+
 
       const shouldRedirect = document.getElementById("saveProfileBtn").dataset.redirect === "true";
       if (shouldRedirect) {
@@ -380,7 +408,8 @@
       });
 
       const result = await res.json();
-      document.getElementById("passwordMsg").innerText = result.message;
+      document.getElementById("successModalBody").innerText = result.message || "Password changed successfully.";
+      $('#successModal').modal('show');
     });
 
     loadProfile();
